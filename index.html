@@ -3069,10 +3069,19 @@ var qrcode = function() {
    CONFIG + DATA (injected at build)
    ============================================================ */
 const CONFIG = {
-  backendUrl: "",     // Google Apps Script Web App URL (not a secret). May be overridden per-device in settings.
-  pinHash:    "996a66481cabf0cbef3d77d73de3c572976c2ab477ce714528deb76f16019c33",        // sha-256 of staff PIN
+  backendEnc: "GhoGFRRTXF0dERcOGQdcCR0KAAUWXA0dCEgEEhEcHRZIGlwzJRQcBAsKClwFBiZRP0U/KCsLGSEIWhggAxElEyY4EzEYBjYpLStVIzE/BCINPxBCBzsZVTBdGiUNICMiCzkaHxcRCi0hIyBdAB8MEA==",     // ลิงก์ Apps Script (บดบังด้วย XOR+base64 — ไม่ใช่ความปลอดภัยจริง แค่ไม่ให้เห็นตรงๆ)
+  pinHash:    "a268e47c2aabfd8c9e6eac615564d426d33f08bcd7fd2789315517676987a97f",        // sha-256 ของรหัสผ่านเจ้าหน้าที่
   build:      "2026-06-19"
 };
+function _deobf(b64){
+  if(!b64) return "";
+  try{
+    const x = atob(b64), key = "rnregis"; let s = "";
+    for(let i=0;i<x.length;i++) s += String.fromCharCode(x.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    return s;
+  }catch(_){ return ""; }
+}
+CONFIG.backendUrl = _deobf(CONFIG.backendEnc);   // ถอดบดบังตอนรันไทม์
 const HOUSES = {"1":"https://line.me/ti/g2/EJazWUOSsBtE-wvI7aYamb1tCJCPaPB6NlrHdQ?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","2":"https://line.me/ti/g2/d6N638qmiFLBqi1v6nqU_ybzfg2SPrraLf7Sew?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","3":"https://line.me/ti/g2/JpcKP0x4-wBG2vi8Lwxb7nhdb1BwvjysX3ksKA?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","4":"https://line.me/ti/g2/b71PLT9ZZHEH1pKWmO-M_kiLVuA6XVZXCUJqDQ?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","5":"https://line.me/ti/g2/dK2scZ7N1T_A6Z0dNRa1PO_voNjPSPdadBweIA?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","6":"https://line.me/ti/g2/D_lSYfNxFkugRCxWMV-Tn2c_7yzt7tTL-KZOMg?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","7":"https://line.me/ti/g2/JVGky8vEcUWtcRTy6AONlvObsWAV18cLLbvcDQ?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","8":"https://line.me/ti/g2/_XXrEAgZP6ppQt4MzYrZ3OVplBEcQ_1FBWGcdw?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","9":"https://line.me/ti/g2/E9MQ4zRj3M37ZKrBG29dsbD-KbSRqCsgZkyObA?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","10":"https://line.me/ti/g2/HR-A-_v0Rml_dfeEZU8zyZxM8lH2irIKCZYXmw?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","11":"https://line.me/ti/g2/gbkuJKtNoy56AfNsAYGeCxqgmgdLPkQ5rt8eGQ?utm_source=invitation&utm_medium=QR_code&utm_campaign=default","12":"https://line.me/ti/g2/S0ClnejFWaKYeQlsGFGTw7lURmDfFn63LgO_hA?utm_source=invitation&utm_medium=QR_code&utm_campaign=default"};   // {"1": lineUrl, ...} — ไม่ใช่ข้อมูลส่วนบุคคล
 const PDPA_VERSION = "1";
 const CHECKPOINTS = [
