@@ -1,0 +1,1549 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b2a52">
+<meta name="robots" content="noindex, nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<title>ค้นหาบ้าน · กิจกรรมรับน้อง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  /* surfaces & ink */
+  --bg:           oklch(1 0 0);
+  --surface:      oklch(0.985 0.004 350);
+  --surface-2:    oklch(0.968 0.008 350);
+  --ink:          oklch(0.24 0.03 350);
+  --ink-2:        oklch(0.455 0.028 350);
+  --ink-3:        oklch(0.60 0.02 350);
+  --line:         oklch(0.905 0.012 350);
+  --line-2:       oklch(0.845 0.016 350);
+
+  /* brand (student / actions) */
+  --primary:      oklch(0.535 0.205 356);
+  --primary-deep: oklch(0.47 0.20 356);
+  --primary-ink:  oklch(0.995 0.004 356);
+  --primary-weak: oklch(0.965 0.028 356);
+  --primary-tint: oklch(0.93 0.05 356);
+
+  /* staff (ops / cool) */
+  --slate:        oklch(0.285 0.045 264);
+  --slate-2:      oklch(0.345 0.05 264);
+  --slate-ink:    oklch(0.97 0.01 264);
+  --slate-weak:   oklch(0.955 0.018 264);
+
+  /* semantic */
+  --ok:           oklch(0.565 0.135 152);
+  --ok-deep:      oklch(0.46 0.13 152);
+  --ok-weak:      oklch(0.95 0.045 152);
+  --ok-ink:       oklch(0.99 0.01 152);
+  --warn:         oklch(0.62 0.16 64);
+  --warn-weak:    oklch(0.96 0.05 70);
+  --danger:       oklch(0.555 0.19 27);
+  --danger-weak:  oklch(0.965 0.035 27);
+
+  /* line brand */
+  --line-green:   oklch(0.74 0.18 152);
+  --line-green-d: oklch(0.62 0.17 152);
+
+  /* geometry */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 26px; --r-full: 999px;
+  --shadow-sm: 0 1px 2px oklch(0.3 0.03 350 / .06), 0 1px 3px oklch(0.3 0.03 350 / .05);
+  --shadow-md: 0 4px 12px oklch(0.3 0.03 350 / .08), 0 2px 5px oklch(0.3 0.03 350 / .05);
+  --shadow-lg: 0 18px 50px oklch(0.3 0.03 350 / .14), 0 6px 18px oklch(0.3 0.03 350 / .08);
+  --shadow-glow: 0 10px 40px var(--primary-tint);
+
+  --ease: cubic-bezier(.22,1,.36,1);          /* ease-out-quint */
+  --ease-soft: cubic-bezier(.33,1,.68,1);
+
+  /* z-scale */
+  --z-sticky: 100; --z-dropdown: 300; --z-overlay: 500; --z-modal: 600; --z-toast: 800;
+
+  --maxw: 1120px;
+  font-synthesis: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+body{
+  font-family:"IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background:var(--bg); color:var(--ink);
+  font-size:16px; line-height:1.55; font-weight:400;
+  min-height:100dvh; min-height:100vh;
+  overflow-x:hidden;
+}
+body[data-role="staff"]{ background:var(--surface-2); }
+.tnum{ font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1; letter-spacing:.01em; }
+button,input,select{ font:inherit; color:inherit; }
+button{ cursor:pointer; border:none; background:none; }
+a{ color:inherit; text-decoration:none; }
+::selection{ background:var(--primary-tint); }
+:focus-visible{ outline:2.5px solid var(--primary); outline-offset:2px; border-radius:4px; }
+[hidden]{ display:none !important; }
+svg{ display:block; }
+
+/* ============================================================
+   SHARED ATOMS
+   ============================================================ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.5em;
+  height:46px; padding:0 20px; border-radius:var(--r-md);
+  font-weight:600; font-size:.97rem; white-space:nowrap;
+  transition:transform .12s var(--ease), background .15s, box-shadow .2s, border-color .15s;
+  user-select:none;
+}
+.btn:active{ transform:translateY(1px) scale(.99); }
+.btn-primary{ background:var(--primary); color:var(--primary-ink); box-shadow:var(--shadow-sm); }
+.btn-primary:hover{ background:var(--primary-deep); box-shadow:var(--shadow-md); }
+.btn-ghost{ background:var(--surface-2); color:var(--ink); }
+.btn-ghost:hover{ background:var(--line); }
+.btn-line{ background:var(--line-green); color:#06371f; box-shadow:0 4px 16px oklch(0.74 0.18 152 / .35); }
+.btn-line:hover{ background:var(--line-green-d); color:#042a17; }
+.btn-block{ width:100%; }
+.btn-lg{ height:54px; font-size:1.05rem; padding:0 26px; }
+
+.pill{ display:inline-flex; align-items:center; gap:.4em; height:26px; padding:0 11px;
+  border-radius:var(--r-full); font-size:.78rem; font-weight:600; }
+
+/* ============================================================
+   STUDENT — SHELL
+   ============================================================ */
+.stu{ display:flex; flex-direction:column; min-height:100dvh; min-height:100vh; }
+.stu-bgwrap{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+.stu-blob{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.5; }
+.stu-blob.b1{ width:46vw; height:46vw; max-width:560px; max-height:560px; top:-16vh; right:-10vw;
+  background:radial-gradient(circle at 30% 30%, var(--primary-tint), transparent 70%); }
+.stu-blob.b2{ width:40vw; height:40vw; max-width:480px; max-height:480px; bottom:-18vh; left:-12vw;
+  background:radial-gradient(circle at 60% 40%, oklch(0.9 0.06 230 / .8), transparent 70%); }
+
+.topbar{ position:sticky; top:0; z-index:var(--z-sticky);
+  display:flex; align-items:center; gap:12px;
+  padding:14px clamp(16px,4vw,28px);
+  background:oklch(1 0 0 / .72); backdrop-filter:saturate(1.4) blur(14px);
+  border-bottom:1px solid var(--line); }
+.brandmark{ display:flex; align-items:center; gap:11px; font-weight:700; letter-spacing:-.01em; }
+.brandmark .glyph{ width:34px; height:34px; border-radius:10px; flex:none;
+  background:linear-gradient(145deg, var(--primary), oklch(0.62 0.2 320));
+  display:grid; place-items:center; color:#fff; box-shadow:var(--shadow-sm); }
+.brandmark .glyph svg{ width:19px; height:19px; }
+.brandmark .t1{ font-size:1.02rem; line-height:1.1; }
+.brandmark .t2{ font-size:.74rem; font-weight:500; color:var(--ink-2); letter-spacing:0; }
+.topbar-spacer{ flex:1; }
+.staff-link{ display:inline-flex; align-items:center; gap:6px; font-size:.84rem; font-weight:500;
+  color:var(--ink-2); padding:8px 12px; border-radius:var(--r-full);
+  border:1px solid var(--line); transition:.15s; }
+.staff-link:hover{ color:var(--ink); border-color:var(--line-2); background:var(--surface); }
+
+.stu-main{ flex:1; width:100%; max-width:720px; margin:0 auto;
+  padding:clamp(28px,7vw,72px) clamp(16px,4vw,28px) 64px; }
+
+/* hero / search */
+.hero{ text-align:center; margin-bottom:clamp(22px,4vw,34px); }
+.hero h1{ font-size:clamp(2rem,7vw,3.1rem); font-weight:700; line-height:1.04;
+  letter-spacing:-.025em; text-wrap:balance; }
+.hero h1 .accent{ color:var(--primary); }
+.hero p{ margin-top:12px; color:var(--ink-2); font-size:clamp(1rem,2.6vw,1.12rem); text-wrap:balance; }
+
+.search{ position:relative; }
+.search-field{ position:relative; display:flex; align-items:center;
+  background:var(--bg); border:1.5px solid var(--line-2); border-radius:var(--r-xl);
+  box-shadow:var(--shadow-md); transition:border-color .18s, box-shadow .25s; }
+.search-field:focus-within{ border-color:var(--primary); box-shadow:var(--shadow-glow), var(--shadow-md); }
+.search-field .ico{ width:24px; height:24px; margin-left:20px; color:var(--ink-3); flex:none; }
+.search-field input{ flex:1; border:none; background:none; outline:none;
+  height:62px; padding:0 14px; font-size:1.12rem; font-weight:500; min-width:0; }
+.search-field input::placeholder{ color:var(--ink-3); font-weight:400; }
+/* ซ่อนปุ่มล้าง (x) ของเบราว์เซอร์เอง เพราะเรามีปุ่มล้างของเราเองแล้ว */
+.search-field input::-webkit-search-cancel-button,
+.search-field input::-webkit-search-decoration{ -webkit-appearance:none; appearance:none; }
+.search-field input{ appearance:none; }
+.search-clear{ display:grid; place-items:center; width:34px; height:34px; margin-right:12px;
+  border-radius:50%; color:var(--ink-2); background:var(--surface-2); flex:none; }
+.search-clear:hover{ background:var(--line); color:var(--ink); }
+.search-hint{ margin-top:12px; text-align:center; font-size:.86rem; color:var(--ink-3); }
+
+/* results list */
+.results{ margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+.res-row{ display:flex; align-items:center; gap:14px; width:100%; text-align:start;
+  padding:13px 16px; background:var(--bg); border:1px solid var(--line);
+  border-radius:var(--r-md); box-shadow:var(--shadow-sm);
+  transition:transform .14s var(--ease), border-color .15s, box-shadow .18s;
+  animation:rowIn .4s var(--ease) both; }
+.res-row:hover{ border-color:var(--primary); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+.res-dot{ width:42px; height:42px; border-radius:12px; flex:none; display:grid; place-items:center;
+  font-weight:700; color:#fff; font-size:1.02rem;
+  background:oklch(0.58 0.15 var(--hh)); box-shadow:inset 0 0 0 1px oklch(1 0 0 / .15); }
+.res-name{ flex:1; min-width:0; }
+.res-name b{ font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.res-name span{ font-size:.84rem; color:var(--ink-2); }
+.res-house{ font-size:.8rem; font-weight:600; color:var(--ink-2); white-space:nowrap; }
+.res-house b{ color:oklch(0.5 0.16 var(--hh)); }
+.res-chev{ width:18px; height:18px; color:var(--ink-3); flex:none; }
+@keyframes rowIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+
+.emptystate{ text-align:center; padding:36px 20px; color:var(--ink-2); }
+.emptystate .em-ico{ width:54px; height:54px; margin:0 auto 14px; color:var(--ink-3); }
+.emptystate b{ color:var(--ink); font-weight:600; display:block; margin-bottom:4px; font-size:1.05rem; }
+.muted-list{ margin-top:30px; text-align:center; color:var(--ink-3); font-size:.82rem; }
+
+/* ============================================================
+   STUDENT — RESULT CARD (modal-ish full panel)
+   ============================================================ */
+.detail-overlay{ position:fixed; inset:0; z-index:var(--z-modal);
+  display:grid; place-items:end center; padding:0;
+  background:oklch(0.25 0.04 350 / .42); backdrop-filter:blur(3px);
+  animation:fade .25s var(--ease) both; }
+@media(min-width:640px){ .detail-overlay{ place-items:center; padding:24px; } }
+@keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
+
+.detail{ position:relative; width:100%; max-width:480px;
+  background:var(--bg); border-radius:var(--r-xl) var(--r-xl) 0 0;
+  box-shadow:var(--shadow-lg); overflow:hidden;
+  max-height:94dvh; overflow-y:auto;
+  animation:sheetUp .42s var(--ease) both; }
+@media(min-width:640px){ .detail{ border-radius:var(--r-xl); animation:popIn .4s var(--ease) both; } }
+@keyframes sheetUp{ from{ transform:translateY(100%); } to{ transform:none; } }
+@keyframes popIn{ from{ opacity:0; transform:translateY(14px) scale(.97); } to{ opacity:1; transform:none; } }
+
+.detail-hero{ position:relative; padding:30px 26px 26px; color:#fff; text-align:center;
+  background:
+    radial-gradient(120% 120% at 50% -20%, oklch(0.72 0.16 var(--hh) / .55), transparent 60%),
+    linear-gradient(160deg, oklch(0.56 0.16 var(--hh)), oklch(0.44 0.17 var(--hh))); }
+.detail-grab{ position:absolute; top:9px; left:50%; transform:translateX(-50%);
+  width:42px; height:5px; border-radius:99px; background:oklch(1 0 0 / .5); }
+@media(min-width:640px){ .detail-grab{ display:none; } }
+.detail-close{ position:absolute; top:14px; right:14px; width:36px; height:36px; border-radius:50%;
+  display:grid; place-items:center; color:#fff; background:oklch(1 0 0 / .18); backdrop-filter:blur(4px);
+  transition:.15s; }
+.detail-close:hover{ background:oklch(1 0 0 / .3); }
+.detail-eyebrow{ font-size:.82rem; font-weight:500; opacity:.92; margin-bottom:2px; }
+.detail-house{ font-size:clamp(3.2rem,15vw,4.4rem); font-weight:700; line-height:.95; letter-spacing:-.04em;
+  text-shadow:0 2px 16px oklch(0.2 0.1 var(--hh) / .35); }
+.detail-house small{ font-size:.32em; font-weight:600; vertical-align:middle; opacity:.9; margin-right:.15em; letter-spacing:0; }
+
+.detail-body{ padding:22px 26px 28px; }
+.idcard{ display:flex; flex-direction:column; gap:3px; text-align:center; margin-bottom:22px; }
+.idcard .nm{ font-size:1.32rem; font-weight:700; letter-spacing:-.01em; text-wrap:balance; line-height:1.2; }
+.idcard .meta{ font-size:.9rem; color:var(--ink-2); }
+.idcard .sid{ display:inline-block; margin-top:6px; font-size:.92rem; font-weight:600;
+  color:var(--ink); background:var(--surface-2); padding:5px 14px; border-radius:var(--r-full); }
+
+.line-box{ border:1px solid var(--line); border-radius:var(--r-lg); padding:18px; text-align:center;
+  background:linear-gradient(180deg, var(--surface), var(--bg)); }
+.line-box h3{ font-size:1rem; font-weight:600; margin-bottom:3px; }
+.line-box .sub{ font-size:.84rem; color:var(--ink-2); margin-bottom:16px; }
+.qr-frame{ width:188px; height:188px; margin:0 auto 16px; padding:12px; background:#fff;
+  border-radius:var(--r-md); box-shadow:var(--shadow-sm); border:1px solid var(--line); }
+.qr-frame svg{ width:100%; height:100%; }
+.line-box .scan-cap{ font-size:.8rem; color:var(--ink-3); margin-bottom:14px; }
+
+/* ============================================================
+   STAFF — PIN GATE
+   ============================================================ */
+.gate{ position:fixed; inset:0; z-index:var(--z-overlay);
+  display:grid; place-items:center; padding:24px;
+  background:linear-gradient(165deg, var(--slate), oklch(0.22 0.05 264));
+  color:var(--slate-ink); animation:fade .3s var(--ease) both; }
+.gate-card{ width:100%; max-width:360px; text-align:center; }
+.gate-ico{ width:62px; height:62px; margin:0 auto 20px; border-radius:18px;
+  display:grid; place-items:center; background:oklch(1 0 0 / .1); color:#fff;
+  box-shadow:inset 0 0 0 1px oklch(1 0 0 / .12); }
+.gate-card h2{ font-size:1.5rem; font-weight:700; letter-spacing:-.01em; }
+.gate-card p{ margin-top:8px; color:oklch(0.84 0.02 264); font-size:.92rem; }
+.pin-display{ display:flex; justify-content:center; gap:12px; margin:28px 0 6px; }
+.pin-dot{ width:16px; height:16px; border-radius:50%; background:oklch(1 0 0 / .16);
+  transition:transform .2s var(--ease), background .2s; }
+.pin-dot.on{ background:#fff; transform:scale(1.15); }
+.gate.err .pin-display{ animation:shake .4s; }
+@keyframes shake{ 10%,90%{transform:translateX(-2px)} 30%,70%{transform:translateX(-7px)} 50%{transform:translateX(7px)} }
+.gate-err{ min-height:20px; color:oklch(0.82 0.13 25); font-size:.86rem; font-weight:500; margin-top:10px; }
+.gate-form{ margin-top:26px; }
+.gate-input{ display:flex; align-items:center; background:oklch(1 0 0 / .1); border:1.5px solid oklch(1 0 0 / .18);
+  border-radius:var(--r-md); transition:border-color .15s, box-shadow .2s, background .15s; }
+.gate-input:focus-within{ border-color:#fff; background:oklch(1 0 0 / .15); box-shadow:0 0 0 4px oklch(1 0 0 / .12); }
+.gate.err .gate-input{ animation:shake .4s; border-color:oklch(0.78 0.15 25); }
+.gate-input input{ flex:1; min-width:0; height:54px; padding:0 4px 0 18px; border:none; background:none; outline:none;
+  color:#fff; font-size:1.1rem; font-weight:600; letter-spacing:.04em; }
+.gate-input input::placeholder{ color:oklch(0.78 0.02 264); font-weight:400; letter-spacing:0; }
+.gate-eye{ display:grid; place-items:center; width:46px; height:54px; color:oklch(0.82 0.02 264); flex:none; }
+.gate-eye:hover{ color:#fff; }
+.gate-submit{ width:100%; height:52px; margin-top:14px; border-radius:var(--r-md);
+  background:#fff; color:var(--slate); font-weight:700; font-size:1rem;
+  transition:transform .12s var(--ease), box-shadow .2s, opacity .15s; box-shadow:0 8px 24px oklch(0 0 0 / .25); }
+.gate-submit:hover{ box-shadow:0 12px 30px oklch(0 0 0 / .3); }
+.gate-submit:active{ transform:translateY(1px) scale(.99); }
+.keypad{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:24px; }
+.key{ height:62px; border-radius:var(--r-md); font-size:1.4rem; font-weight:600;
+  background:oklch(1 0 0 / .08); color:#fff; transition:transform .1s var(--ease), background .15s; }
+.key:hover{ background:oklch(1 0 0 / .15); }
+.key:active{ transform:scale(.94); background:oklch(1 0 0 / .22); }
+.key.wide{ font-size:.95rem; font-weight:500; }
+.gate-back{ margin-top:22px; color:oklch(0.78 0.02 264); font-size:.88rem; }
+.gate-back:hover{ color:#fff; }
+
+/* ============================================================
+   STAFF — CONSOLE
+   ============================================================ */
+.staff{ display:flex; flex-direction:column; min-height:100dvh; min-height:100vh; }
+.staff-bar{ position:sticky; top:0; z-index:var(--z-sticky);
+  display:flex; align-items:center; gap:12px; color:var(--slate-ink);
+  padding:12px clamp(14px,3vw,26px);
+  background:linear-gradient(180deg, var(--slate-2), var(--slate));
+  box-shadow:var(--shadow-md); }
+.staff-bar .title{ display:flex; flex-direction:column; line-height:1.15; }
+.staff-bar .title b{ font-weight:700; font-size:1rem; }
+.staff-bar .title span{ font-size:.74rem; color:oklch(0.82 0.02 264); font-weight:500; }
+.staff-bar .sp{ flex:1; }
+.sync-pill{ display:inline-flex; align-items:center; gap:7px; height:30px; padding:0 13px;
+  border-radius:var(--r-full); font-size:.78rem; font-weight:600;
+  background:oklch(1 0 0 / .1); }
+.sync-pill .dot{ width:8px; height:8px; border-radius:50%; background:var(--ink-3); flex:none; }
+.sync-pill.online .dot{ background:oklch(0.78 0.16 152); box-shadow:0 0 0 3px oklch(0.78 0.16 152 / .25); animation:pulse 2.4s var(--ease) infinite; }
+.sync-pill.offline{ background:oklch(0.62 0.16 64 / .22); }
+.sync-pill.offline .dot{ background:var(--warn); }
+.sync-pill.syncing .dot{ background:oklch(0.8 0.1 230); animation:pulse 1s infinite; }
+@keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.45} }
+.iconbtn{ display:grid; place-items:center; width:38px; height:38px; border-radius:10px;
+  color:var(--slate-ink); background:oklch(1 0 0 / .08); transition:.15s; }
+.iconbtn:hover{ background:oklch(1 0 0 / .16); }
+.iconbtn svg{ width:19px; height:19px; }
+
+.staff-main{ flex:1; width:100%; max-width:var(--maxw); margin:0 auto;
+  padding:clamp(14px,2.5vw,22px) clamp(12px,3vw,26px) 60px; display:flex; flex-direction:column; gap:18px; }
+
+/* checkpoint selector */
+.section-label{ font-size:.8rem; font-weight:600; color:var(--ink-2); margin-bottom:9px; letter-spacing:.01em; }
+.checkpoints{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.cp{ position:relative; padding:14px 12px; border-radius:var(--r-md); text-align:start;
+  background:var(--bg); border:1.5px solid var(--line); transition:transform .14s var(--ease), border-color .15s, box-shadow .2s; }
+.cp:hover{ border-color:var(--line-2); }
+.cp .cp-k{ font-size:.74rem; font-weight:600; color:var(--ink-3); }
+.cp .cp-v{ font-size:1.02rem; font-weight:700; letter-spacing:-.01em; margin-top:1px; }
+.cp .cp-n{ font-size:.92rem; font-weight:600; margin-top:6px; color:var(--ink-2); }
+.cp .cp-n b{ color:var(--primary); }
+.cp.active{ border-color:var(--primary); background:var(--primary-weak); box-shadow:var(--shadow-md); }
+.cp.active .cp-k{ color:var(--primary-deep); }
+.cp.active::after{ content:""; position:absolute; top:12px; right:12px; width:10px; height:10px;
+  border-radius:50%; background:var(--primary); box-shadow:0 0 0 4px var(--primary-weak); }
+
+/* scan panel */
+.scanpanel{ background:var(--bg); border:1px solid var(--line); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-sm); padding:clamp(16px,3vw,22px); }
+.scan-field{ position:relative; display:flex; align-items:center;
+  background:var(--surface); border:2px solid var(--line-2); border-radius:var(--r-md);
+  transition:border-color .15s, box-shadow .2s; }
+.scan-field:focus-within{ border-color:var(--primary); box-shadow:var(--shadow-glow); background:var(--bg); }
+.scan-field .ico{ width:24px; height:24px; margin-left:16px; color:var(--ink-3); flex:none; }
+.scan-field input{ flex:1; border:none; background:none; outline:none; min-width:0;
+  height:58px; padding:0 12px; font-size:1.12rem; font-weight:600; }
+.scan-field .go{ height:42px; margin-right:8px; padding:0 18px; border-radius:var(--r-sm);
+  background:var(--primary); color:var(--primary-ink); font-weight:600; font-size:.92rem; flex:none; }
+.scan-field .go:hover{ background:var(--primary-deep); }
+.scan-note{ margin-top:10px; font-size:.83rem; color:var(--ink-3); display:flex; align-items:center; gap:7px; }
+
+/* feedback banner after scan */
+.feedback{ margin-top:14px; border-radius:var(--r-md); padding:15px 17px;
+  display:flex; align-items:center; gap:14px; animation:fbIn .34s var(--ease) both; }
+@keyframes fbIn{ from{ opacity:0; transform:scale(.97) translateY(-4px); } to{ opacity:1; transform:none; } }
+.feedback .fb-ico{ width:42px; height:42px; border-radius:12px; flex:none; display:grid; place-items:center; color:#fff; }
+.feedback .fb-body{ flex:1; min-width:0; }
+.feedback .fb-name{ font-weight:700; font-size:1.06rem; }
+.feedback .fb-sub{ font-size:.86rem; margin-top:1px; }
+.feedback .fb-chips{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.feedback.ok{ background:var(--ok-weak); border:1px solid oklch(0.8 0.1 152); }
+.feedback.ok .fb-ico{ background:var(--ok); }
+.feedback.ok .fb-sub{ color:var(--ok-deep); }
+.feedback.warn{ background:var(--warn-weak); border:1px solid oklch(0.82 0.1 70); }
+.feedback.warn .fb-ico{ background:var(--warn); }
+.feedback.err{ background:var(--danger-weak); border:1px solid oklch(0.84 0.1 27); }
+.feedback.err .fb-ico{ background:var(--danger); }
+.feedback.err .fb-sub{ color:var(--danger); }
+.dup-toggle{ flex:none; }
+
+.minichip{ display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 9px;
+  border-radius:var(--r-full); font-size:.74rem; font-weight:600; }
+.minichip.has{ background:var(--ok); color:var(--ok-ink); }
+.minichip.miss{ background:oklch(0.93 0.01 350); color:var(--ink-2); }
+
+/* stats */
+.stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; }
+.stat{ background:var(--bg); border:1px solid var(--line); border-radius:var(--r-md); padding:14px 16px; }
+.stat .k{ font-size:.78rem; color:var(--ink-2); font-weight:500; }
+.stat .v{ font-size:1.7rem; font-weight:700; letter-spacing:-.02em; line-height:1.1; margin-top:3px; }
+.stat .v small{ font-size:.5em; font-weight:600; color:var(--ink-3); }
+.stat.hl{ background:linear-gradient(160deg, var(--ok-weak), var(--bg)); border-color:oklch(0.84 0.07 152); }
+.stat.hl .v{ color:var(--ok-deep); }
+.stat .bar{ height:5px; border-radius:99px; background:var(--surface-2); margin-top:9px; overflow:hidden; }
+.stat .bar i{ display:block; height:100%; border-radius:99px; background:var(--ok); transition:width .6s var(--ease); }
+
+/* table panel */
+.tablewrap{ background:var(--bg); border:1px solid var(--line); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-sm); overflow:hidden; }
+.table-tools{ display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  padding:14px clamp(12px,2vw,18px); border-bottom:1px solid var(--line); }
+.tfilter{ position:relative; display:flex; align-items:center; flex:1; min-width:170px;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:var(--r-sm); }
+.tfilter .ico{ width:18px; height:18px; margin-left:12px; color:var(--ink-3); flex:none; }
+.tfilter input{ flex:1; border:none; background:none; outline:none; height:40px; padding:0 12px; min-width:0; font-size:.92rem; }
+.sel{ height:40px; border:1px solid var(--line-2); border-radius:var(--r-sm); background:var(--surface);
+  padding:0 32px 0 12px; font-size:.9rem; font-weight:500; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 9px center; appearance:none; -webkit-appearance:none; }
+.table-scroll{ overflow-x:auto; max-height:62vh; overflow-y:auto; }
+table.att{ width:100%; border-collapse:collapse; font-size:.9rem; }
+table.att thead th{ position:sticky; top:0; z-index:2; background:var(--surface-2);
+  font-weight:600; font-size:.78rem; color:var(--ink-2); text-align:start;
+  padding:11px 12px; white-space:nowrap; border-bottom:1px solid var(--line); }
+table.att th.c, table.att td.c{ text-align:center; }
+table.att tbody td{ padding:9px 12px; border-bottom:1px solid var(--surface-2); vertical-align:middle; }
+table.att tbody tr:hover{ background:var(--surface); }
+table.att tbody tr.complete{ background:oklch(0.97 0.03 152 / .5); }
+table.att tbody tr.complete:hover{ background:oklch(0.95 0.045 152 / .7); }
+.rownum{ color:var(--ink-3); font-size:.82rem; }
+.t-name b{ font-weight:600; }
+.t-name span{ display:block; font-size:.76rem; color:var(--ink-3); }
+.hdot{ display:inline-block; width:24px; height:24px; border-radius:7px; color:#fff; font-weight:700;
+  font-size:.74rem; line-height:24px; text-align:center; background:oklch(0.58 0.15 var(--hh)); }
+.check{ width:30px; height:30px; border-radius:8px; border:1.5px solid var(--line-2);
+  background:var(--bg); display:inline-grid; place-items:center; transition:.13s; vertical-align:middle; }
+.check svg{ width:17px; height:17px; color:#fff; opacity:0; transform:scale(.5); transition:.15s var(--ease); }
+.check:hover{ border-color:var(--ok); }
+.check.on{ background:var(--ok); border-color:var(--ok); }
+.check.on svg{ opacity:1; transform:none; }
+.statustag{ font-size:.76rem; font-weight:700; }
+.statustag.ok{ color:var(--ok-deep); }
+.statustag.no{ color:var(--ink-3); }
+.table-foot{ padding:12px 16px; font-size:.82rem; color:var(--ink-2); border-top:1px solid var(--line);
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.table-empty{ padding:40px 20px; text-align:center; color:var(--ink-3); }
+
+/* settings modal */
+.modal-bg{ position:fixed; inset:0; z-index:var(--z-modal); display:grid; place-items:center; padding:20px;
+  background:oklch(0.25 0.04 264 / .5); backdrop-filter:blur(3px); animation:fade .2s var(--ease) both; }
+.modal{ width:100%; max-width:460px; background:var(--bg); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-lg); overflow:hidden; animation:popIn .32s var(--ease) both; }
+.modal-head{ padding:18px 22px; border-bottom:1px solid var(--line); display:flex; align-items:center; }
+.modal-head h3{ font-size:1.1rem; font-weight:700; flex:1; }
+.modal-body{ padding:22px; display:flex; flex-direction:column; gap:16px; }
+.field label{ display:block; font-size:.86rem; font-weight:600; margin-bottom:6px; }
+.field .desc{ font-size:.8rem; color:var(--ink-2); margin-bottom:8px; line-height:1.5; }
+.field input{ width:100%; height:46px; padding:0 14px; border:1.5px solid var(--line-2);
+  border-radius:var(--r-sm); outline:none; font-size:.95rem; background:var(--surface); transition:.15s; }
+.field input:focus{ border-color:var(--primary); background:var(--bg); box-shadow:var(--shadow-glow); }
+.statline{ font-size:.82rem; display:flex; align-items:center; gap:7px; }
+.statline.ok{ color:var(--ok-deep); }
+.statline.no{ color:var(--danger); }
+.modal-foot{ padding:16px 22px; background:var(--surface); border-top:1px solid var(--line);
+  display:flex; gap:10px; justify-content:flex-end; }
+
+/* toast */
+.toaster{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:var(--z-toast);
+  display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; width:min(92vw,420px); }
+.toast{ pointer-events:auto; display:flex; align-items:center; gap:10px;
+  padding:12px 16px; border-radius:var(--r-md); background:var(--ink); color:#fff;
+  font-size:.9rem; font-weight:500; box-shadow:var(--shadow-lg); animation:toastIn .35s var(--ease) both; }
+.toast.ok{ background:var(--ok-deep); }
+.toast.err{ background:var(--danger); }
+.toast svg{ width:18px; height:18px; flex:none; }
+@keyframes toastIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+
+/* responsive */
+@media(max-width:560px){
+  .checkpoints{ grid-template-columns:1fr; }
+  .cp{ display:flex; align-items:center; gap:12px; }
+  .cp .cp-n{ margin:0 0 0 auto; }
+  table.att thead th.hide-sm, table.att tbody td.hide-sm{ display:none; }
+  .staff-bar .title span{ display:none; }
+}
+
+/* ============================================================
+   GEMSTONE THEME — เฉพาะหน้านักศึกษา (แซฟไฟร์ + ทอง)
+   ============================================================ */
+:root{
+  --gem-bg1:  oklch(0.31 0.095 256);
+  --gem-bg2:  oklch(0.185 0.075 268);
+  --gem-gold: oklch(0.845 0.155 88);
+  --gem-gold-d: oklch(0.74 0.145 78);
+  --gem-sky:  oklch(0.74 0.13 232);
+  --gem-cyan: oklch(0.83 0.10 205);
+  --gem-ink:  oklch(0.975 0.012 250);
+  --gem-soft: oklch(0.83 0.035 244);
+}
+body:not([data-role="staff"]){
+  background:
+    radial-gradient(125% 90% at 10% -12%, oklch(0.44 0.11 248 / .85), transparent 55%),
+    radial-gradient(95% 75% at 98% -4%, oklch(0.50 0.12 230 / .5), transparent 52%),
+    radial-gradient(130% 120% at 50% 122%, oklch(0.34 0.10 272 / .85), transparent 60%),
+    linear-gradient(168deg, var(--gem-bg1), var(--gem-bg2));
+  background-attachment:fixed;
+}
+
+/* ฉากหลังตกแต่ง: แสงเรือง + เหลี่ยมอัญมณี + ประกาย */
+.stu-blob{ mix-blend-mode:screen; }
+.stu-blob.b1{ background:radial-gradient(circle at 35% 30%, oklch(0.86 0.15 90 / .55), transparent 68%); opacity:.55; }
+.stu-blob.b2{ background:radial-gradient(circle at 60% 40%, oklch(0.72 0.15 232 / .6), transparent 70%); opacity:.5; }
+.gem-facet{ position:absolute; filter:blur(46px); opacity:.42; mix-blend-mode:screen;
+  border-radius:46% 54% 60% 40% / 42% 46% 54% 58%; }
+.gem-facet.f1{ width:34vw; height:34vw; max-width:420px; max-height:420px; top:26vh; left:-7vw;
+  background:conic-gradient(from 210deg, oklch(0.84 0.15 92 / .8), oklch(0.62 0.13 232 / .5), transparent 72%); transform:rotate(16deg); }
+.gem-facet.f2{ width:30vw; height:30vw; max-width:360px; max-height:360px; bottom:6vh; right:-6vw;
+  background:conic-gradient(from 40deg, oklch(0.74 0.13 230 / .7), oklch(0.84 0.15 92 / .5), transparent 70%); transform:rotate(-22deg); }
+.spark{ position:absolute; width:12px; height:12px; opacity:0;
+  background:radial-gradient(circle, var(--gem-gold) 0 18%, transparent 60%);
+  filter:drop-shadow(0 0 6px oklch(0.86 0.15 90 / .8));
+  animation:twinkle 4.5s var(--ease) infinite; }
+.spark::before{ content:""; position:absolute; inset:-3px;
+  background:
+    linear-gradient(transparent 45%, oklch(0.95 0.06 90) 50%, transparent 55%),
+    linear-gradient(90deg, transparent 45%, oklch(0.95 0.06 90) 50%, transparent 55%); }
+.spark.s1{ top:16%; left:22%; animation-delay:.0s; }
+.spark.s2{ top:30%; right:14%; width:9px; height:9px; animation-delay:1.1s; }
+.spark.s3{ top:62%; left:12%; width:8px; height:8px; animation-delay:2.2s;
+  background:radial-gradient(circle, var(--gem-cyan) 0 18%, transparent 60%); filter:drop-shadow(0 0 6px oklch(0.85 0.12 210 /.8)); }
+.spark.s4{ bottom:18%; right:24%; animation-delay:.7s; }
+.spark.s5{ top:46%; right:30%; width:7px; height:7px; animation-delay:3s; }
+.spark.s6{ bottom:30%; left:34%; width:9px; height:9px; animation-delay:1.7s;
+  background:radial-gradient(circle, var(--gem-cyan) 0 18%, transparent 60%); filter:drop-shadow(0 0 6px oklch(0.85 0.12 210 /.8)); }
+@keyframes twinkle{ 0%,100%{ opacity:0; transform:scale(.4) rotate(0deg); } 45%,55%{ opacity:.95; transform:scale(1) rotate(45deg); } }
+
+/* topbar */
+.stu .topbar{ background:oklch(0.21 0.07 262 / .55); backdrop-filter:saturate(1.4) blur(16px);
+  border-bottom-color:oklch(0.8 0.12 88 / .16); }
+.stu .brandmark .glyph{ background:linear-gradient(150deg, var(--gem-gold), var(--gem-gold-d));
+  color:oklch(0.30 0.07 70); box-shadow:0 4px 16px oklch(0.82 0.15 85 / .4), inset 0 1px 0 oklch(1 0 0 / .5); }
+.stu .brandmark .t1{ color:var(--gem-ink); }
+.stu .brandmark .t2{ color:var(--gem-soft); }
+.stu .staff-link{ color:var(--gem-soft); border-color:oklch(0.8 0.1 240 / .26); background:oklch(0.5 0.08 250 / .16); }
+.stu .staff-link:hover{ color:oklch(0.30 0.07 70); border-color:var(--gem-gold); background:var(--gem-gold); }
+
+/* hero */
+.stu .hero h1{ color:var(--gem-ink); text-shadow:0 2px 34px oklch(0.5 0.12 250 / .55); }
+.stu .hero h1 .accent{ color:var(--gem-gold); }
+.stu .hero p{ color:var(--gem-soft); }
+
+/* search */
+.stu .search-field{ background:oklch(0.985 0.008 250); border-color:oklch(0.85 0.06 250 / .35);
+  box-shadow:0 20px 55px oklch(0.10 0.07 266 / .55), 0 0 0 1px oklch(0.85 0.13 88 / .14); }
+.stu .search-field:focus-within{ border-color:var(--gem-gold);
+  box-shadow:0 0 0 4px oklch(0.84 0.15 88 / .28), 0 20px 55px oklch(0.10 0.07 266 / .6); }
+.stu .search-hint{ color:var(--gem-soft); }
+
+/* results */
+.stu .res-row{ background:oklch(0.55 0.07 252 / .3); border-color:oklch(0.82 0.08 245 / .24);
+  backdrop-filter:blur(9px) saturate(1.2); box-shadow:0 8px 24px oklch(0.10 0.07 266 / .4); }
+.stu .res-row:hover{ border-color:var(--gem-gold); background:oklch(0.6 0.08 250 / .38);
+  box-shadow:0 12px 30px oklch(0.10 0.07 266 / .5); }
+.stu .res-dot{ box-shadow:inset 0 1px 0 oklch(1 0 0 / .45), 0 3px 10px oklch(0.10 0.05 260 / .5); }
+.stu .res-name b{ color:var(--gem-ink); }
+.stu .res-name span{ color:var(--gem-soft); }
+.stu .res-house{ color:var(--gem-soft); }
+.stu .res-house b{ color:var(--gem-gold); }
+.stu .res-chev{ color:var(--gem-soft); }
+.stu .emptystate{ color:var(--gem-soft); }
+.stu .emptystate b{ color:var(--gem-ink); }
+.stu .emptystate .em-ico{ color:oklch(0.72 0.09 244); }
+.stu .muted-list{ color:var(--gem-soft); }
+
+/* เช็คลิสต์สอนใช้งาน (to-do) + การ์ดสายรหัส */
+.guide{ margin-top:26px; display:flex; flex-direction:column; gap:14px; }
+.checklist{ background:oklch(0.55 0.07 252 / .26); border:1px solid oklch(0.82 0.08 245 / .22);
+  border-radius:var(--r-lg); padding:16px 18px 8px; backdrop-filter:blur(9px) saturate(1.2);
+  box-shadow:0 8px 24px oklch(0.10 0.07 266 / .35); }
+.checklist-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px; }
+.checklist-head h2{ font-size:1.04rem; font-weight:700; color:var(--gem-ink); letter-spacing:-.01em; }
+.checklist-prog{ flex:none; font-size:.78rem; font-weight:700; color:oklch(0.30 0.06 70);
+  background:var(--gem-gold); padding:3px 11px; border-radius:var(--r-full); font-variant-numeric:tabular-nums;
+  transition:background .25s; }
+.check-items{ list-style:none; }
+.check-item{ display:flex; align-items:flex-start; gap:13px; padding:11px 2px; }
+.check-item + .check-item{ border-top:1px solid oklch(0.8 0.08 245 / .12); }
+.ci-box{ position:relative; flex:none; width:26px; height:26px; border-radius:50%;
+  border:2px solid oklch(0.8 0.1 245 / .42); display:grid; place-items:center; color:oklch(0.28 0.06 70);
+  margin-top:1px; transition:background .25s var(--ease), border-color .25s, box-shadow .25s; }
+.ci-box svg{ position:absolute; width:15px; height:15px; opacity:0; transform:scale(.4); transition:.25s var(--ease); }
+.ci-num{ font-size:.8rem; font-weight:700; color:var(--gem-soft); transition:opacity .2s; }
+.check-item.done .ci-box{ background:var(--gem-gold); border-color:var(--gem-gold);
+  box-shadow:0 0 0 4px oklch(0.84 0.15 88 / .2); }
+.check-item.done .ci-num{ opacity:0; }
+.check-item.done .ci-box svg{ opacity:1; transform:none; }
+.ci-text{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+.ci-text b{ font-weight:600; color:var(--gem-ink); font-size:.97rem; transition:color .2s; }
+.ci-text span{ font-size:.83rem; color:var(--gem-soft); line-height:1.45; }
+.check-item.done .ci-text b{ color:var(--gem-gold); }
+.checklist-done{ display:none; align-items:center; gap:9px; margin:6px 2px 12px; padding:11px 14px;
+  border-radius:var(--r-md); font-size:.9rem; font-weight:600; color:oklch(0.92 0.08 150);
+  background:oklch(0.6 0.12 152 / .16); border:1px solid oklch(0.7 0.13 152 / .35); }
+.checklist-done svg{ width:18px; height:18px; flex:none; }
+.checklist.all-done .checklist-done{ display:flex; animation:fbIn .4s var(--ease) both; }
+.checklist.all-done .checklist-prog{ background:oklch(0.72 0.15 150); color:oklch(0.2 0.06 150); }
+
+.sairhad{ display:flex; align-items:center; gap:14px; padding:15px 18px; border-radius:var(--r-lg);
+  background:linear-gradient(135deg, oklch(0.6 0.12 90 / .24), oklch(0.5 0.1 250 / .2));
+  border:1.5px solid oklch(0.84 0.14 88 / .45); backdrop-filter:blur(9px) saturate(1.2);
+  box-shadow:0 8px 24px oklch(0.10 0.07 266 / .35);
+  transition:transform .15s var(--ease), box-shadow .2s, border-color .15s; }
+.sairhad:hover{ transform:translateY(-2px); border-color:var(--gem-gold); box-shadow:0 14px 34px oklch(0.10 0.07 266 / .5); }
+.sairhad:active{ transform:translateY(0) scale(.995); }
+.sai-ico{ flex:none; width:46px; height:46px; border-radius:13px; display:grid; place-items:center;
+  font-size:1.5rem; line-height:1; background:linear-gradient(145deg, var(--gem-gold), var(--gem-gold-d));
+  box-shadow:inset 0 1px 0 oklch(1 0 0 / .45), 0 3px 12px oklch(0.82 0.15 85 / .35); }
+.sai-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.sai-body b{ color:var(--gem-ink); font-weight:700; font-size:1rem; }
+.sai-body span{ color:var(--gem-soft); font-size:.84rem; line-height:1.45; }
+.sai-cta{ flex:none; font-weight:700; font-size:.9rem; color:var(--gem-gold); white-space:nowrap; }
+.sairhad.done{ border-color:oklch(0.7 0.13 152 / .55); }
+.sairhad.done .sai-cta{ color:oklch(0.82 0.13 150); }
+.sairhad.done .sai-cta::after{ content:" ✓"; }
+@media(max-width:440px){
+  .sairhad{ flex-wrap:wrap; }
+  .sai-cta{ width:100%; text-align:end; }
+}
+
+/* การ์ดผลลัพธ์ — เหลี่ยมอัญมณี + ขอบทอง */
+.detail-overlay .detail{ box-shadow:var(--shadow-lg), 0 0 0 1px oklch(0.85 0.13 88 / .25); }
+.detail-overlay .detail-hero{ box-shadow:inset 0 -1px 0 oklch(0.86 0.14 88 / .3); }
+.detail-overlay .detail-hero::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(125deg, oklch(1 0 0 / .22) 0 18%, transparent 38%),
+    radial-gradient(140% 70% at 80% 0%, oklch(1 0 0 / .18), transparent 55%); }
+.detail-overlay .detail-hero::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:
+    radial-gradient(circle, oklch(1 0 0 / .9) 0 22%, transparent 55%),
+    radial-gradient(circle, oklch(1 0 0 / .7) 0 22%, transparent 55%);
+  background-size:7px 7px, 5px 5px; background-position:18% 30%, 78% 60%; background-repeat:no-repeat;
+  filter:drop-shadow(0 0 4px oklch(1 0 0 / .6)); opacity:.85; }
+.detail-overlay .detail-eyebrow{ color:oklch(0.97 0.05 92); text-shadow:0 1px 4px oklch(0.2 0.1 var(--hh) / .4); }
+.detail-overlay .detail-house{ position:relative; z-index:1; }
+
+/* spinner โหลดข้อมูล */
+.loader{ width:34px; height:34px; border-radius:50%; margin:2px auto 14px;
+  border:3px solid oklch(0.8 0.08 245 / .28); border-top-color:var(--gem-gold); animation:spin .8s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.btn-gold{ background:var(--gem-gold); color:oklch(0.28 0.06 70); box-shadow:0 6px 20px oklch(0.82 0.15 85 / .35); }
+.btn-gold:hover{ background:var(--gem-gold-d); }
+.btn-gold:disabled{ opacity:.4; pointer-events:none; box-shadow:none; }
+
+/* ====== PDPA consent gate (หน้านักศึกษา) ====== */
+.pdpa{ position:fixed; inset:0; z-index:var(--z-overlay); display:grid; place-items:center; padding:18px;
+  background:linear-gradient(165deg, var(--gem-bg1), var(--gem-bg2)); color:var(--gem-ink);
+  animation:fade .3s var(--ease) both; overflow:auto; }
+.pdpa-card{ width:100%; max-width:450px; background:oklch(0.55 0.06 252 / .3);
+  border:1px solid oklch(0.84 0.13 88 / .3); border-radius:var(--r-xl); padding:26px 24px;
+  backdrop-filter:blur(16px) saturate(1.2); box-shadow:var(--shadow-lg); max-height:94dvh; overflow-y:auto; }
+.pdpa-ico{ width:54px; height:54px; border-radius:15px; display:grid; place-items:center; margin-bottom:16px;
+  background:linear-gradient(145deg, var(--gem-gold), var(--gem-gold-d)); color:oklch(0.30 0.07 70);
+  box-shadow:inset 0 1px 0 oklch(1 0 0 / .45); }
+.pdpa-card h2{ font-size:1.3rem; font-weight:700; letter-spacing:-.01em; color:var(--gem-ink); line-height:1.2; }
+.pdpa-card .lead{ margin-top:8px; color:var(--gem-soft); font-size:.9rem; line-height:1.5; }
+.pdpa-list{ list-style:none; margin:18px 0; display:flex; flex-direction:column; gap:11px; }
+.pdpa-list li{ display:flex; gap:10px; font-size:.87rem; color:var(--gem-ink); line-height:1.5; }
+.pdpa-list li svg{ width:17px; height:17px; flex:none; margin-top:3px; color:var(--gem-gold); }
+.pdpa-list li b{ color:var(--gem-gold); font-weight:600; }
+.pdpa-consent{ display:flex; gap:11px; align-items:flex-start; padding:13px 14px; border-radius:var(--r-md);
+  background:oklch(1 0 0 / .07); border:1px solid oklch(0.84 0.1 88 / .25); cursor:pointer; user-select:none; }
+.pdpa-consent input{ width:20px; height:20px; flex:none; margin-top:1px; accent-color:var(--gem-gold); cursor:pointer; }
+.pdpa-consent span{ font-size:.87rem; color:var(--gem-ink); line-height:1.45; }
+.pdpa-foot{ margin-top:12px; text-align:center; font-size:.78rem; color:var(--gem-soft); }
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; scroll-behavior:auto !important; }
+  .spark{ opacity:.7; }
+  .loader{ border-top-color:var(--gem-gold); animation:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====================== STUDENT VIEW ====================== -->
+<div class="stu" id="studentView">
+  <div class="stu-bgwrap" aria-hidden="true">
+    <div class="stu-blob b1"></div>
+    <div class="stu-blob b2"></div>
+    <div class="gem-facet f1"></div>
+    <div class="gem-facet f2"></div>
+    <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
+    <span class="spark s4"></span><span class="spark s5"></span><span class="spark s6"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="brandmark">
+      <span class="glyph" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9.5a.5.5 0 0 0 .5.5H9v-6h6v6h3.5a.5.5 0 0 0 .5-.5V10"/></svg>
+      </span>
+      <span class="brandmark-txt">
+        <span class="t1">ค้นหาบ้านของฉัน</span><br>
+        <span class="t2">กิจกรรมรับน้อง · คณะวิทยาศาสตร์</span>
+      </span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <a class="staff-link" id="toStaff" href="#staff">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      เจ้าหน้าที่
+    </a>
+  </header>
+
+  <main class="stu-main">
+    <div class="hero">
+      <h1>น้อง<span class="accent">อยู่บ้านไหน?</span></h1>
+      <p>พิมพ์รหัสนักศึกษา หรือชื่อ-นามสกุล เพื่อค้นหาบ้านและกลุ่มไลน์ของน้อง</p>
+    </div>
+
+    <div class="search">
+      <div class="search-field">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <input id="stuSearch" type="search" inputmode="search" autocomplete="off" enterkeyhint="search"
+               placeholder="เช่น 69102100XX หรือ สมหญิง ใจดี" aria-label="ค้นหารหัสหรือชื่อนักศึกษา">
+        <button class="search-clear" id="stuClear" hidden aria-label="ล้าง">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <p class="search-hint" id="stuHint">พิมพ์อย่างน้อย 2 ตัวอักษร · ค้นหาได้ทั้งรหัสและชื่อ</p>
+    </div>
+
+    <div class="results" id="stuResults" aria-live="polite"></div>
+
+    <section class="guide" aria-label="ขั้นตอนการใช้งาน">
+      <div class="checklist" id="checklist">
+        <div class="checklist-head">
+          <h2>หาบ้านง่ายๆ 3 ขั้นตอน</h2>
+          <span class="checklist-prog" id="checkProg">0/3</span>
+        </div>
+        <ol class="check-items">
+          <li class="check-item" data-step="search">
+            <span class="ci-box"><span class="ci-num">1</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="ci-text"><b>ค้นหาตัวเอง</b><span>พิมพ์รหัสนักศึกษา หรือชื่อ-นามสกุล ในช่องด้านบน</span></span>
+          </li>
+          <li class="check-item" data-step="house">
+            <span class="ci-box"><span class="ci-num">2</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="ci-text"><b>เปิดดูว่าอยู่บ้านไหน</b><span>แตะที่ชื่อของน้อง เพื่อดูเลขบ้านประจำตัว</span></span>
+          </li>
+          <li class="check-item" data-step="line">
+            <span class="ci-box"><span class="ci-num">3</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="ci-text"><b>เข้ากลุ่มไลน์ประจำบ้าน</b><span>กดปุ่มเข้ากลุ่มไลน์ หรือสแกน QR ในการ์ด</span></span>
+          </li>
+        </ol>
+        <div class="checklist-done" id="checklistDone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          ครบแล้ว! เจอบ้านและเข้ากลุ่มเรียบร้อย 🎉
+        </div>
+      </div>
+
+      <a class="sairhad" id="saiLink" data-step="sai"
+         href="https://docs.google.com/spreadsheets/d/1nYHoUtpsp9ETQmZwFQUMR1sC8VNcxzwzd-AEr6m5qhM/edit?usp=sharing"
+         target="_blank" rel="noopener">
+        <span class="sai-ico" aria-hidden="true">🧬</span>
+        <span class="sai-body">
+          <b>พร้อมเล่นสายรหัส?</b>
+          <span>ฝากชื่อ + ช่องทางติดต่อไว้ ให้รุ่นพี่สายรหัสมาตามหาน้องได้เลย</span>
+        </span>
+        <span class="sai-cta">กรอกข้อมูล&nbsp;→</span>
+      </a>
+    </section>
+  </main>
+</div>
+
+<!-- result detail mounts here -->
+<div id="detailMount"></div>
+
+<!-- ====================== STAFF VIEW ====================== -->
+<div id="staffView" hidden></div>
+
+<!-- overlays -->
+<div id="pdpaMount"></div>
+<div id="gateMount"></div>
+<div id="modalMount"></div>
+<div class="toaster" id="toaster" aria-live="assertive"></div>
+
+<script>/*__QRLIB__*/</script>
+<script>
+"use strict";
+/* ============================================================
+   CONFIG + DATA (injected at build)
+   ============================================================ */
+const CONFIG = {
+  backendUrl: "__BACKEND_URL__",     // Google Apps Script Web App URL (not a secret). May be overridden per-device in settings.
+  pinHash:    "__PIN_HASH__",        // sha-256 of staff PIN
+  build:      "__BUILD__"
+};
+const HOUSES = /*__HOUSES__*/;   // {"1": lineUrl, ...} — ไม่ใช่ข้อมูลส่วนบุคคล
+const PDPA_VERSION = "1";
+const CHECKPOINTS = [
+  { id:"d1",  k:"ช่วงที่ 1", v:"เข้างานวันแรก",  date:"20 มิ.ย." },
+  { id:"d2",  k:"ช่วงที่ 2", v:"เข้างานวันสอง",  date:"21 มิ.ย." },
+  { id:"out", k:"ช่วงที่ 3", v:"ออกงาน",          date:"" }
+];
+const SLOTS = CHECKPOINTS.map(c=>c.id);
+const HOUSE_HUE = h => (356 + (h-1)*30) % 360;
+
+/* normalize search text */
+const norm = s => (s||"").toString().toLowerCase().replace(/\s+/g,"").trim();
+
+/* รายชื่อนักศึกษา (PII) ถูกเก็บแยกใน Google Sheet — โหลดมาตอนรันไทม์ ไม่ฝังในไฟล์นี้ */
+let STUDENTS = [];
+let BY_ID = new Map();
+let rosterReady = false;
+const LS_ROSTER = "regis.roster";
+function setRoster(rows){
+  // rows: [[id, prefix, first, last, house, program], ...]
+  STUDENTS = (rows||[]).filter(r=>r && r[0]).map(r=>{
+    const id=String(r[0]).trim(), prefix=(r[1]||"").trim(), first=(r[2]||"").trim(),
+          last=(r[3]||"").trim(), house=parseInt(r[4],10)||0, program=(r[5]||"").trim();
+    return { id, prefix, first, last, house, program,
+      name:((prefix?prefix+" ":"")+first+" "+last).trim(), fullname:(first+" "+last).trim() };
+  });
+  STUDENTS.forEach(s=>{ s._k = norm(s.id+s.first+s.last); s._kn = norm(s.fullname); });
+  BY_ID = new Map(STUDENTS.map(s=>[s.id, s]));
+  rosterReady = STUDENTS.length>0;
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const el = (tag,cls,html)=>{ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const debounce=(fn,ms)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+function fmtTs(ms){ if(!ms) return ""; const d=new Date(+ms); if(isNaN(d)) return "";
+  const p=n=>("0"+n).slice(-2);
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds()); }
+
+async function sha256hex(str){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function qrSvg(text){
+  const qr = qrcode(0, "M"); qr.addData(text); qr.make();
+  return qr.createSvgTag({ cellSize:5, margin:0, scalable:true });
+}
+function toast(msg, kind=""){
+  const t = el("div","toast "+kind);
+  const ico = kind==="ok" ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
+            : kind==="err" ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>' : "";
+  t.innerHTML = ico + "<span>"+esc(msg)+"</span>";
+  $("#toaster").appendChild(t);
+  setTimeout(()=>{ t.style.transition="opacity .3s, transform .3s"; t.style.opacity="0"; t.style.transform="translateY(8px)"; setTimeout(()=>t.remove(),320); }, 2600);
+}
+
+/* ============================================================
+   STUDENT SEARCH
+   ============================================================ */
+function searchStudents(q, limit=24){
+  const k = norm(q);
+  if(k.length < 2) return [];
+  const exact=[], starts=[], incl=[];
+  for(const s of STUDENTS){
+    if(s.id===k || s._kn===k){ exact.push(s); continue; }
+    if(s.id.startsWith(k) || s.first.toLowerCase().startsWith(q.trim().toLowerCase()) || s._kn.startsWith(k)){ starts.push(s); continue; }
+    if(s._k.includes(k) || s._kn.includes(k)){ incl.push(s); }
+    if(exact.length+starts.length+incl.length > limit+40) break;
+  }
+  return [...exact, ...starts, ...incl].slice(0, limit);
+}
+
+const stuInput = $("#stuSearch"), stuResults = $("#stuResults"), stuHint = $("#stuHint"), stuClear = $("#stuClear");
+
+/* ---- tutorial checklist (to-do) ---- */
+const TUT_KEY = "regis.tutorial";
+let tutorial = (()=>{ try{ return JSON.parse(localStorage.getItem(TUT_KEY))||{}; }catch(_){ return {}; } })();
+function markTutorial(step){
+  if(tutorial[step]) return;
+  tutorial[step] = 1;
+  try{ localStorage.setItem(TUT_KEY, JSON.stringify(tutorial)); }catch(_){}
+  renderTutorial();
+}
+function renderTutorial(){
+  const core = ["search","house","line"];
+  core.forEach(s=>{
+    const li = document.querySelector(`.check-item[data-step="${s}"]`);
+    if(li) li.classList.toggle("done", !!tutorial[s]);
+  });
+  const done = core.filter(s=>tutorial[s]).length;
+  const prog = $("#checkProg"); if(prog) prog.textContent = done+"/3";
+  const cl = $("#checklist"); if(cl) cl.classList.toggle("all-done", done===core.length);
+  const sai = $("#saiLink"); if(sai) sai.classList.toggle("done", !!tutorial.sai);
+}
+const saiLink = $("#saiLink");
+if(saiLink) saiLink.addEventListener("click", ()=>markTutorial("sai"));
+
+let rosterLoading = false, rosterErrorMsg = "";
+function renderStuResults(){
+  const q = stuInput.value;
+  stuClear.hidden = !q;
+  if(!rosterReady){
+    stuHint.hidden = true;
+    if(rosterLoading){
+      stuResults.innerHTML = `<div class="emptystate"><div class="loader" aria-hidden="true"></div>
+        <b>กำลังโหลดข้อมูลรายชื่อ…</b><div>รอสักครู่นะ</div></div>`;
+    } else {
+      stuResults.innerHTML = `<div class="emptystate">
+        <svg class="em-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <b>ยังโหลดข้อมูลไม่ได้</b>
+        <div>${esc(rosterErrorMsg||"ระบบยังไม่ได้เชื่อมต่อฐานข้อมูล")}</div>
+        <button class="btn btn-ghost" id="rosterRetry" style="margin-top:14px">ลองอีกครั้ง</button>
+      </div>`;
+      const rb=$("#rosterRetry"); if(rb) rb.addEventListener("click", ()=>bootRoster(true));
+    }
+    return;
+  }
+  const k = norm(q);
+  if(k.length < 2){ stuResults.innerHTML=""; stuHint.hidden=false; return; }
+  stuHint.hidden = true;
+  const list = searchStudents(q);
+  if(list.length) markTutorial("search");
+  if(!list.length){
+    stuResults.innerHTML = `<div class="emptystate">
+      <svg class="em-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      <b>ไม่พบข้อมูล “${esc(q)}”</b>
+      <div>ลองตรวจสอบรหัสนักศึกษาอีกครั้ง หรือค้นด้วยชื่อจริง</div>
+    </div>`;
+    return;
+  }
+  stuResults.innerHTML = "";
+  list.forEach((s,i)=>{
+    const row = el("button","res-row");
+    row.style.setProperty("--hh", HOUSE_HUE(s.house));
+    row.style.animationDelay = Math.min(i*22,260)+"ms";
+    row.innerHTML = `
+      <span class="res-dot">${s.house}</span>
+      <span class="res-name"><b>${esc(s.name)}</b><span class="tnum">${esc(s.id)}</span></span>
+      <span class="res-house">บ้าน <b class="tnum">${s.house}</b></span>
+      <svg class="res-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>`;
+    row.addEventListener("click", ()=>openDetail(s));
+    stuResults.appendChild(row);
+  });
+}
+stuInput.addEventListener("input", debounce(renderStuResults, 90));
+stuInput.addEventListener("keydown", e=>{ if(e.key==="Enter"){ const l=searchStudents(stuInput.value); if(l.length) openDetail(l[0]); }});
+stuClear.addEventListener("click", ()=>{ stuInput.value=""; stuInput.focus(); renderStuResults(); });
+
+/* result detail */
+function openDetail(s){
+  markTutorial("house");
+  const hue = HOUSE_HUE(s.house);
+  const lineUrl = HOUSES[s.house] || "";
+  const mount = $("#detailMount");
+  const ov = el("div","detail-overlay");
+  ov.style.setProperty("--hh", hue);
+  ov.innerHTML = `
+    <div class="detail" role="dialog" aria-modal="true" aria-label="ผลการค้นหาบ้าน">
+      <div class="detail-hero">
+        <div class="detail-grab"></div>
+        <button class="detail-close" aria-label="ปิด">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <div class="detail-eyebrow">น้องอยู่</div>
+        <div class="detail-house"><small>บ้าน</small><span class="tnum">${s.house}</span></div>
+      </div>
+      <div class="detail-body">
+        <div class="idcard">
+          <div class="nm">${esc(s.name)}</div>
+          <div class="meta">${esc(s.program)}</div>
+          <div class="sid tnum">${esc(s.id)}</div>
+        </div>
+        <div class="line-box">
+          <h3>เข้ากลุ่มไลน์บ้าน ${s.house}</h3>
+          <div class="sub">รวมเพื่อนบ้านเดียวกันไว้ที่นี่</div>
+          ${lineUrl ? `<div class="qr-frame">${qrSvg(lineUrl)}</div>
+            <div class="scan-cap">สแกน QR หรือกดปุ่มด้านล่างเพื่อเข้ากลุ่ม</div>
+            <a class="btn btn-line btn-block btn-lg" href="${esc(lineUrl)}" target="_blank" rel="noopener">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 5.6 2 10c0 3.9 3.5 7.2 8.3 7.9.3.07.7.22.8.5.07.25.05.64.02.9l-.13.8c-.04.24-.2.93.82.5 1.02-.42 5.5-3.24 7.5-5.55C20.6 13.5 22 11.9 22 10c0-4.4-4.5-8-10-8Z"/></svg>
+              เข้ากลุ่มไลน์
+            </a>` : `<div class="scan-cap">ยังไม่มีลิงก์กลุ่มไลน์สำหรับบ้านนี้</div>`}
+        </div>
+        <button class="btn btn-ghost btn-block" style="margin-top:14px" data-close>ค้นหาคนอื่น</button>
+      </div>
+    </div>`;
+  const close = ()=>{ ov.style.animation="fade .2s reverse both"; setTimeout(()=>ov.remove(),190); document.body.style.overflow=""; stuInput.focus(); };
+  ov.addEventListener("click", e=>{ if(e.target===ov) close(); });
+  ov.querySelector(".detail-close").addEventListener("click", close);
+  ov.querySelector("[data-close]").addEventListener("click", close);
+  const lineBtn = ov.querySelector(".btn-line");
+  if(lineBtn) lineBtn.addEventListener("click", ()=>markTutorial("line"));
+  document.addEventListener("keydown", function onk(e){ if(e.key==="Escape"){ close(); document.removeEventListener("keydown",onk); }});
+  mount.innerHTML=""; mount.appendChild(ov);
+  document.body.style.overflow="hidden";
+}
+
+/* ============================================================
+   ATTENDANCE STORE + SYNC
+   ============================================================ */
+const LS_BACKEND = "regis.backendUrl";
+const LS_DATA    = "regis.attendance";
+const Store = {
+  data: {},          // { id: {d1:1,d2:1,out:0, t:ts} }
+  rev: 0,
+  backendUrl(){ return localStorage.getItem(LS_BACKEND) || CONFIG.backendUrl || ""; },
+  setBackend(u){ if(u) localStorage.setItem(LS_BACKEND,u); else localStorage.removeItem(LS_BACKEND); },
+  online: false,
+  loadLocal(){ try{ this.data = JSON.parse(localStorage.getItem(LS_DATA)||"{}"); }catch(_){ this.data={}; } },
+  saveLocal(){ localStorage.setItem(LS_DATA, JSON.stringify(this.data)); },
+  rec(id){ return this.data[id] || (this.data[id]={}); },
+  get(id,slot){ return !!(this.data[id] && this.data[id][slot]); },
+  getTs(id,slot){ const r=this.data[id]; return (r && r.ts && r.ts[slot]) ? r.ts[slot] : 0; },
+  complete(id){ const r=this.data[id]; return !!r && SLOTS.every(s=>r[s]); },
+  countComplete(){ let n=0; for(const id in this.data){ if(this.complete(id)) n++; } return n; },
+  countSlot(slot){ let n=0; for(const id in this.data){ if(this.data[id][slot]) n++; } return n; }
+};
+
+async function apiList(){
+  const url = Store.backendUrl(); if(!url) throw new Error("no-backend");
+  const r = await fetch(url+"?action=list&t="+Date.now(), { method:"GET" });
+  if(!r.ok) throw new Error("http "+r.status);
+  return r.json();    // { ok, data:{id:{d1,d2,out,t}} }
+}
+async function apiMark(id, slot, val, ts){
+  const url = Store.backendUrl(); if(!url) throw new Error("no-backend");
+  const r = await fetch(url, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify({ action:"mark", id, slot, val:val?1:0, t: ts || Date.now() }) });
+  if(!r.ok) throw new Error("http "+r.status);
+  return r.json();
+}
+async function apiRoster(){
+  const url = Store.backendUrl(); if(!url) throw new Error("no-backend");
+  const r = await fetch(url+"?action=roster&t="+Date.now(), { method:"GET" });
+  if(!r.ok) throw new Error("http "+r.status);
+  const j = await r.json();
+  if(!j.ok || !Array.isArray(j.rows)) throw new Error("bad-response");
+  return j.rows;    // [[id,prefix,first,last,house,program], ...]
+}
+/* โหลดรายชื่อจากฐานข้อมูล (Google Sheet) + แคชในเครื่องเพื่อความเร็ว/เสถียร */
+async function loadRoster(force){
+  let cached=null;
+  try{ cached = JSON.parse(localStorage.getItem(LS_ROSTER)||"null"); }catch(_){}
+  if(cached && Array.isArray(cached.rows) && cached.rows.length && !force){ setRoster(cached.rows); }
+  if(!Store.backendUrl()){
+    return { ok: rosterReady, source:"cache", reason: rosterReady?"":"no-backend" };
+  }
+  try{
+    const rows = await apiRoster();
+    setRoster(rows);
+    try{ localStorage.setItem(LS_ROSTER, JSON.stringify({ rows, t:Date.now() })); }catch(_){}
+    return { ok:true, source:"network", count:rows.length };
+  }catch(e){
+    return { ok: rosterReady, source:"cache", reason:e.message };
+  }
+}
+
+let syncTimer=null, syncing=false;
+function setSyncState(state){    // online|offline|syncing|local
+  const pill = $("#syncPill"); if(!pill) return;
+  pill.className = "sync-pill " + (state==="syncing"?"syncing":state==="online"?"online":"offline");
+  const label = { online:"ซิงก์ออนไลน์", syncing:"กำลังซิงก์…", offline:"ออฟไลน์", local:"เครื่องนี้เท่านั้น" }[state]||state;
+  pill.querySelector(".lbl").textContent = label;
+}
+function mergeServer(serverData){
+  // server is source of truth for confirmed marks; keep any local-only newer marks
+  const merged = {};
+  for(const id in serverData){
+    merged[id] = Object.assign({}, serverData[id]);
+    merged[id].ts = Object.assign({}, serverData[id].ts || {});
+  }
+  for(const id in Store.data){
+    const loc = Store.data[id];
+    if(!merged[id]) merged[id] = { ts:{} };
+    merged[id].ts = merged[id].ts || {};
+    for(const s of SLOTS){
+      // if local has a mark the server lacks and it's recent/pending, keep it (and its timestamp)
+      if(loc[s] && !merged[id][s] && loc._pending && loc._pending[s]){
+        merged[id][s]=1;
+        if(loc.ts && loc.ts[s]) merged[id].ts[s] = loc.ts[s];
+      }
+    }
+    if(loc._pending) merged[id]._pending = loc._pending;
+  }
+  Store.data = merged;
+}
+async function syncNow(){
+  if(syncing) return; if(!Store.backendUrl()) { setSyncState("local"); return; }
+  syncing=true; setSyncState("syncing");
+  try{
+    const res = await apiList();
+    if(res && res.ok){
+      const sd = {};
+      for(const id in res.data){ const r=res.data[id];
+        sd[id]={ d1:r.d1?1:0, d2:r.d2?1:0, out:r.out?1:0, t:r.t||0,
+          ts:{ d1:+r.t_d1||0, d2:+r.t_d2||0, out:+r.t_out||0 } }; }
+      mergeServer(sd);
+      Store.online=true; Store.saveLocal(); setSyncState("online");
+      if(window.__staffRender) window.__staffRender();
+    } else throw new Error("bad");
+  }catch(e){
+    Store.online=false; setSyncState(Store.backendUrl()?"offline":"local");
+  }finally{ syncing=false; }
+}
+function startSync(){ syncNow(); clearInterval(syncTimer); syncTimer=setInterval(syncNow, 5000); }
+
+async function markAttendance(id, slot, val){
+  const now = Date.now();
+  const r = Store.rec(id);
+  r[slot] = val?1:0; r.t = now;
+  r.ts = r.ts || {};
+  if(val) r.ts[slot] = now; else delete r.ts[slot];   // เก็บเวลาที่กดเช็คของช่วงนั้น
+  r._pending = r._pending || {}; r._pending[slot]=true;
+  Store.saveLocal();
+  if(window.__staffRender) window.__staffRender();
+  if(Store.backendUrl()){
+    try{
+      await apiMark(id, slot, val, now);
+      if(r._pending){ delete r._pending[slot]; }
+      Store.online=true; setSyncState("online");
+    }catch(e){
+      Store.online=false; setSyncState("offline");
+      toast("บันทึกในเครื่องแล้ว · จะซิงก์เมื่อออนไลน์","");
+    }
+  }
+}
+
+/* ============================================================
+   STAFF — PIN GATE
+   ============================================================ */
+function openGate(){
+  const mount = $("#gateMount");
+  const g = el("div","gate");
+  g.innerHTML = `
+    <div class="gate-card">
+      <div class="gate-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <h2>หน่วยลงทะเบียน</h2>
+      <p>กรอกรหัสผ่านเพื่อเข้าสู่ระบบเช็คชื่อกิจกรรม</p>
+      <form class="gate-form" id="gateForm" autocomplete="off">
+        <div class="gate-input">
+          <input id="pinField" type="password" inputmode="text" autocomplete="off" autocapitalize="off"
+                 autocorrect="off" spellcheck="false" placeholder="รหัสผ่านเจ้าหน้าที่" aria-label="รหัสผ่านเจ้าหน้าที่">
+          <button type="button" class="gate-eye" id="gateEye" aria-label="แสดง/ซ่อนรหัสผ่าน" aria-pressed="false">
+            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="gate-err" id="gateErr"></div>
+        <button type="submit" class="gate-submit" id="gateSubmit">เข้าสู่ระบบ</button>
+      </form>
+      <a class="gate-back" href="#">← กลับหน้าค้นหาบ้าน</a>
+    </div>`;
+  mount.innerHTML=""; mount.appendChild(g);
+
+  const field = $("#pinField"), err = $("#gateErr");
+  setTimeout(()=>field.focus(), 60);
+  field.addEventListener("input", ()=>{ err.textContent=""; g.classList.remove("err"); });
+
+  $("#gateEye").addEventListener("click", ()=>{
+    const show = field.type==="password";
+    field.type = show ? "text" : "password";
+    $("#gateEye").setAttribute("aria-pressed", show?"true":"false");
+    $("#eyeIcon").innerHTML = show
+      ? '<path d="M9.9 4.2A9.9 9.9 0 0 1 12 4c6.5 0 10 7 10 7a18 18 0 0 1-2.4 3.4M6.6 6.6A18 18 0 0 0 2 11s3.5 7 10 7a9.5 9.5 0 0 0 4.4-1M3 3l18 18M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'
+      : '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+    field.focus();
+  });
+
+  async function submit(){
+    const val = field.value;
+    if(!val){ field.focus(); return; }
+    const h = await sha256hex(val);
+    if(h===CONFIG.pinHash){
+      sessionStorage.setItem("regis.auth","1");
+      mount.innerHTML=""; enterStaff();
+    } else {
+      g.classList.add("err"); err.textContent="รหัสผ่านไม่ถูกต้อง";
+      field.select();
+      setTimeout(()=>g.classList.remove("err"), 500);
+    }
+  }
+  $("#gateForm").addEventListener("submit", e=>{ e.preventDefault(); submit(); });
+  g.querySelector(".gate-back").addEventListener("click", e=>{ e.preventDefault(); closeGate(); location.hash=""; });
+}
+function closeGate(){ const m=$("#gateMount"); m.innerHTML=""; }
+
+/* ============================================================
+   STAFF — CONSOLE
+   ============================================================ */
+let activeCP = SLOTS[0];
+let tableFilter = { q:"", house:"", status:"" };
+
+function enterStaff(){
+  closeGate();
+  document.body.dataset.role="staff";
+  $("#studentView").hidden=true; $("#detailMount").innerHTML="";
+  const v = $("#staffView"); v.hidden=false;
+  v.innerHTML = staffMarkup();
+  bindStaff();
+  Store.loadLocal();
+  startSync();
+  staffRender();
+  if(!rosterReady){
+    rosterLoading=true; staffRender();
+    loadRoster().then(()=>{ rosterLoading=false; staffRender(); });
+  }
+  setTimeout(()=>$("#scanInput")?.focus(), 50);
+}
+window.__staffRender = ()=>staffRender();
+
+function staffMarkup(){
+  return `
+  <div class="staff">
+    <header class="staff-bar">
+      <div class="title"><b>หน่วยลงทะเบียน</b><span>เช็คชื่อกิจกรรมรับน้อง · ${STUDENTS.length} คน</span></div>
+      <div class="sp"></div>
+      <div class="sync-pill offline" id="syncPill"><span class="dot"></span><span class="lbl">…</span></div>
+      <button class="iconbtn" id="btnSettings" title="ตั้งค่าการเชื่อมต่อ" aria-label="ตั้งค่า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
+      <button class="iconbtn" id="btnLogout" title="ออกจากระบบ" aria-label="ออกจากระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg></button>
+    </header>
+
+    <main class="staff-main">
+      <section>
+        <div class="section-label">1 · เลือกช่วงที่กำลังเช็คชื่อ</div>
+        <div class="checkpoints" id="checkpoints">
+          ${CHECKPOINTS.map(c=>`
+            <button class="cp${c.id===activeCP?" active":""}" data-cp="${c.id}">
+              <div class="cp-k">${c.k}${c.date?" · "+c.date:""}</div>
+              <div class="cp-v">${c.v}</div>
+              <div class="cp-n">มาแล้ว <b id="cpcount-${c.id}" class="tnum">0</b></div>
+            </button>`).join("")}
+        </div>
+      </section>
+
+      <section class="scanpanel">
+        <div class="section-label">2 · สแกนบาร์โค้ด หรือพิมพ์รหัส/ชื่อ แล้วกด Enter</div>
+        <div class="scan-field">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14"/></svg>
+          <input id="scanInput" type="text" autocomplete="off" enterkeyhint="done" placeholder="รอสแกน… หรือพิมพ์รหัสนักศึกษา" aria-label="สแกนหรือพิมพ์รหัสนักศึกษา">
+          <button class="go" id="scanGo">เช็คชื่อ</button>
+        </div>
+        <div class="scan-note">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+          เครื่องอ่านบาร์โค้ดจะกรอกรหัสและกด Enter ให้อัตโนมัติ — ระบบจะเช็คชื่อในช่วงที่เลือกไว้ทันที
+        </div>
+        <div id="scanFeedback"></div>
+      </section>
+
+      <section>
+        <div class="section-label">ภาพรวม</div>
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="tablewrap">
+        <div class="table-tools">
+          <label class="tfilter">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+            <input id="fltQ" type="search" placeholder="ค้นหาในรายชื่อ (รหัส/ชื่อ)" autocomplete="off">
+          </label>
+          <select class="sel" id="fltHouse"><option value="">ทุกบ้าน</option>${[...Array(12)].map((_,i)=>`<option value="${i+1}">บ้าน ${i+1}</option>`).join("")}</select>
+          <select class="sel" id="fltStatus"><option value="">ทุกสถานะ</option><option value="ok">ครบ 3 ช่วง</option><option value="no">ยังไม่ครบ</option></select>
+          <button class="btn btn-ghost" id="btnExport">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+            Export CSV
+          </button>
+        </div>
+        <div class="table-scroll">
+          <table class="att">
+            <thead><tr>
+              <th class="rownum">#</th>
+              <th>นักศึกษา</th>
+              <th class="c">บ้าน</th>
+              <th class="c">${CHECKPOINTS[0].v}<br><small style="font-weight:500;color:var(--ink-3)">${CHECKPOINTS[0].date}</small></th>
+              <th class="c">${CHECKPOINTS[1].v}<br><small style="font-weight:500;color:var(--ink-3)">${CHECKPOINTS[1].date}</small></th>
+              <th class="c">${CHECKPOINTS[2].v}</th>
+              <th class="c">สถานะ</th>
+            </tr></thead>
+            <tbody id="attBody"></tbody>
+          </table>
+        </div>
+        <div class="table-foot" id="tableFoot"></div>
+      </section>
+    </main>
+  </div>`;
+}
+
+function bindStaff(){
+  $("#checkpoints").addEventListener("click", e=>{
+    const b=e.target.closest("[data-cp]"); if(!b) return;
+    activeCP=b.dataset.cp;
+    $$(".cp").forEach(c=>c.classList.toggle("active", c.dataset.cp===activeCP));
+    $("#scanInput").focus();
+  });
+  const doScan=()=>handleScan($("#scanInput").value);
+  $("#scanGo").addEventListener("click", doScan);
+  $("#scanInput").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); doScan(); } });
+  $("#btnLogout").addEventListener("click", logoutStaff);
+  $("#btnSettings").addEventListener("click", openSettings);
+  $("#btnExport").addEventListener("click", exportCSV);
+  $("#fltQ").addEventListener("input", debounce(()=>{ tableFilter.q=$("#fltQ").value; renderTable(); },120));
+  $("#fltHouse").addEventListener("change", ()=>{ tableFilter.house=$("#fltHouse").value; renderTable(); });
+  $("#fltStatus").addEventListener("change", ()=>{ tableFilter.status=$("#fltStatus").value; renderTable(); });
+}
+
+function handleScan(raw){
+  const input=$("#scanInput"); const fb=$("#scanFeedback");
+  const q=(raw||"").trim();
+  if(!q){ return; }
+  // resolve student: exact id, else single name match
+  let s = BY_ID.get(q) || BY_ID.get(q.replace(/\D/g,""));
+  if(!s){
+    const list = searchStudents(q, 6);
+    if(list.length===1) s=list[0];
+    else if(list.length>1){
+      // ambiguous: show picker
+      fb.innerHTML = `<div class="feedback warn">
+        <div class="fb-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg></div>
+        <div class="fb-body"><div class="fb-name">พบหลายคน — เลือกให้ถูกต้อง</div>
+        <div class="fb-chips">${list.map(x=>`<button class="minichip miss pick" data-id="${x.id}" style="cursor:pointer">${esc(x.fullname)} · ${x.id}</button>`).join("")}</div></div>
+      </div>`;
+      fb.querySelectorAll(".pick").forEach(b=>b.addEventListener("click",()=>{ input.value=b.dataset.id; handleScan(b.dataset.id); }));
+      input.select(); return;
+    }
+  }
+  if(!s){
+    fb.innerHTML = `<div class="feedback err">
+      <div class="fb-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></div>
+      <div class="fb-body"><div class="fb-name">ไม่พบ “${esc(q)}”</div><div class="fb-sub">ตรวจสอบรหัสนักศึกษา หรือค้นด้วยชื่อ</div></div></div>`;
+    input.select(); return;
+  }
+  // mark active checkpoint
+  const already = Store.get(s.id, activeCP);
+  markAttendance(s.id, activeCP, true);
+  const cpName = CHECKPOINTS.find(c=>c.id===activeCP).v;
+  const chips = SLOTS.map(slot=>{
+    const has = slot===activeCP ? true : Store.get(s.id,slot);
+    const c = CHECKPOINTS.find(x=>x.id===slot);
+    return `<span class="minichip ${has?"has":"miss"}">${has?"✓":"○"} ${c.v}</span>`;
+  }).join("");
+  const complete = SLOTS.every(slot=> slot===activeCP ? true : Store.get(s.id,slot));
+  fb.innerHTML = `<div class="feedback ok">
+    <div class="fb-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <div class="fb-body">
+      <div class="fb-name">${esc(s.name)} <span style="color:var(--ink-3);font-weight:600">· บ้าน ${s.house}</span></div>
+      <div class="fb-sub">${already?"เช็คชื่อช่วงนี้ไว้แล้ว":"เช็คชื่อ "+esc(cpName)+" เรียบร้อย"} · ${fmtTs(Store.getTs(s.id,activeCP))}${complete?" — <b>ครบ 3 ช่วง ได้ชั่วโมงกิจกรรม 🎉</b>":""}</div>
+      <div class="fb-chips">${chips}</div>
+    </div></div>`;
+  if(navigator.vibrate) navigator.vibrate(complete?[40,40,40]:25);
+  input.value=""; input.focus();
+}
+
+function staffRender(){
+  // checkpoint counts
+  CHECKPOINTS.forEach(c=>{ const e=$("#cpcount-"+c.id); if(e) e.textContent=Store.countSlot(c.id); });
+  renderStats(); renderTable();
+}
+function renderStats(){
+  const wrap=$("#stats"); if(!wrap) return;
+  const total=STUDENTS.length, comp=Store.countComplete();
+  const pct = total? Math.round(comp/total*100):0;
+  wrap.innerHTML = `
+    <div class="stat hl"><div class="k">ครบ 3 ช่วง (ได้ชั่วโมง)</div><div class="v tnum">${comp} <small>/ ${total}</small></div>
+      <div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="stat"><div class="k">${CHECKPOINTS[0].v} · ${CHECKPOINTS[0].date}</div><div class="v tnum">${Store.countSlot("d1")}</div></div>
+    <div class="stat"><div class="k">${CHECKPOINTS[1].v} · ${CHECKPOINTS[1].date}</div><div class="v tnum">${Store.countSlot("d2")}</div></div>
+    <div class="stat"><div class="k">${CHECKPOINTS[2].v}</div><div class="v tnum">${Store.countSlot("out")}</div></div>`;
+}
+
+function filteredStudents(){
+  const q=norm(tableFilter.q), h=tableFilter.house, st=tableFilter.status;
+  return STUDENTS.filter(s=>{
+    if(h && s.house!=+h) return false;
+    if(q && !(s._k.includes(q)||s._kn.includes(q))) return false;
+    if(st==="ok" && !Store.complete(s.id)) return false;
+    if(st==="no" && Store.complete(s.id)) return false;
+    return true;
+  });
+}
+function renderTable(){
+  const body=$("#attBody"); if(!body) return;
+  const scrollEl=$(".table-scroll"); const sy=scrollEl?scrollEl.scrollTop:0;
+  const list=filteredStudents();
+  const MAX=400;
+  const shown=list.slice(0,MAX);
+  body.innerHTML = shown.map((s,i)=>{
+    const complete=Store.complete(s.id);
+    const cells=SLOTS.map(slot=>{
+      const on=Store.get(s.id,slot);
+      const ts=on?Store.getTs(s.id,slot):0;
+      return `<td class="c"><button class="check${on?" on":""}" data-id="${s.id}" data-slot="${slot}" ${ts?`title="เช็คเมื่อ ${fmtTs(ts)}"`:""} aria-label="${on?"ยกเลิก"+(ts?" (เช็คเมื่อ "+fmtTs(ts)+")":""):"เช็คชื่อ"}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button></td>`;
+    }).join("");
+    return `<tr class="${complete?"complete":""}">
+      <td class="rownum tnum">${i+1}</td>
+      <td class="t-name"><b>${esc(s.fullname)}</b><span class="tnum">${esc(s.id)} · ${esc(s.program)}</span></td>
+      <td class="c"><span class="hdot" style="--hh:${HOUSE_HUE(s.house)}">${s.house}</span></td>
+      ${cells}
+      <td class="c"><span class="statustag ${complete?"ok":"no"}">${complete?"ครบ ✓":"—"}</span></td>
+    </tr>`;
+  }).join("");
+  body.querySelectorAll(".check").forEach(b=>b.addEventListener("click",()=>{
+    const id=b.dataset.id, slot=b.dataset.slot, val=!Store.get(id,slot);
+    markAttendance(id,slot,val);
+  }));
+  const foot=$("#tableFoot");
+  if(foot) foot.innerHTML = `แสดง ${shown.length}${list.length>MAX?` จาก ${list.length}`:""} รายชื่อ` +
+    (list.length>MAX?` · <span style="color:var(--ink-3)">พิมพ์ค้นหาเพื่อจำกัดผลลัพธ์</span>`:"") +
+    (list.length===0?`<span class="table-empty">${!rosterReady?(rosterLoading?"กำลังโหลดรายชื่อจากฐานข้อมูล…":"ยังโหลดรายชื่อไม่ได้ — กดไอคอน ⚙️ เพื่อตั้งค่าการเชื่อมต่อ"):"ไม่พบรายชื่อตามเงื่อนไข"}</span>`:"");
+  if(scrollEl) scrollEl.scrollTop=sy;
+}
+
+/* CSV export */
+function exportCSV(){
+  const rows=[["รหัสนักศึกษา","คำนำหน้า","ชื่อ","สกุล","บ้าน","หลักสูตร",
+    CHECKPOINTS[0].v+" ("+CHECKPOINTS[0].date+")", "เวลาเช็ค "+CHECKPOINTS[0].v,
+    CHECKPOINTS[1].v+" ("+CHECKPOINTS[1].date+")", "เวลาเช็ค "+CHECKPOINTS[1].v,
+    CHECKPOINTS[2].v, "เวลาเช็ค "+CHECKPOINTS[2].v,
+    "ครบ 3 ช่วง","ได้ชั่วโมงกิจกรรม"]];
+  STUDENTS.forEach(s=>{
+    const complete=Store.complete(s.id);
+    rows.push([ s.id, s.prefix, s.first, s.last, "บ้าน "+s.house, s.program,
+      Store.get(s.id,"d1")?"มา":"", fmtTs(Store.getTs(s.id,"d1")),
+      Store.get(s.id,"d2")?"มา":"", fmtTs(Store.getTs(s.id,"d2")),
+      Store.get(s.id,"out")?"มา":"", fmtTs(Store.getTs(s.id,"out")),
+      complete?"ครบ":"ไม่ครบ", complete?"ได้":"" ]);
+  });
+  const csv = rows.map(r=>r.map(c=>{ c=(c==null?"":String(c)); return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c; }).join(",")).join("\r\n");
+  const blob = new Blob(["﻿"+csv], { type:"text/csv;charset=utf-8" });
+  const url=URL.createObjectURL(blob);
+  const d=new Date(); const ts=d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)+"-"+("0"+d.getHours()).slice(-2)+("0"+d.getMinutes()).slice(-2);
+  const a=el("a"); a.href=url; a.download="เช็คชื่อกิจกรรมรับน้อง_"+ts+".csv"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast("ดาวน์โหลดไฟล์ CSV แล้ว ("+STUDENTS.length+" รายชื่อ)","ok");
+}
+
+/* settings modal */
+function openSettings(){
+  const mount=$("#modalMount");
+  const cur=Store.backendUrl();
+  const m=el("div","modal-bg");
+  m.innerHTML=`
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head"><h3>ตั้งค่าการเชื่อมต่อ</h3></div>
+      <div class="modal-body">
+        <div class="field">
+          <label>ลิงก์ระบบกลาง (Google Apps Script Web App)</label>
+          <div class="desc">วาง URL ที่ได้จากการ Deploy เพื่อให้ทุกเครื่องเห็นข้อมูลเช็คชื่อตรงกันแบบเรียลไทม์ · ลิงก์นี้ไม่ใช่รหัสฐานข้อมูล</div>
+          <input id="beUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(cur)}">
+        </div>
+        <div class="statline ${Store.online?"ok":"no"}" id="beStat">
+          ${cur? (Store.online?"● เชื่อมต่อแล้ว":"○ ยังเชื่อมต่อไม่ได้ — ตรวจสอบลิงก์/สิทธิ์การเข้าถึง") : "○ ยังไม่ได้ตั้งค่า — ขณะนี้บันทึกเฉพาะในเครื่องนี้"}
+        </div>
+        <div class="field">
+          <div class="desc" style="margin:0">หากไม่ตั้งค่า ระบบจะเก็บข้อมูลในเครื่องนี้เท่านั้น (ยังเช็คชื่อและ Export CSV ได้ตามปกติ)</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-x>ยกเลิก</button>
+        <button class="btn btn-primary" id="beSave">บันทึกและทดสอบ</button>
+      </div>
+    </div>`;
+  mount.innerHTML=""; mount.appendChild(m);
+  const close=()=>{ mount.innerHTML=""; $("#scanInput")?.focus(); };
+  m.addEventListener("click",e=>{ if(e.target===m) close(); });
+  m.querySelector("[data-x]").addEventListener("click",close);
+  $("#beSave").addEventListener("click", async ()=>{
+    const u=$("#beUrl").value.trim().replace(/\s+/g,"");
+    Store.setBackend(u);
+    const stat=$("#beStat");
+    if(!u){ stat.className="statline no"; stat.textContent="○ ล้างการตั้งค่าแล้ว — บันทึกเฉพาะในเครื่องนี้"; setSyncState("local"); return; }
+    stat.className="statline"; stat.textContent="กำลังทดสอบการเชื่อมต่อ…";
+    await syncNow();
+    if(Store.online){ stat.className="statline ok"; stat.textContent="● เชื่อมต่อสำเร็จ — ทุกเครื่องจะเห็นข้อมูลตรงกัน"; toast("เชื่อมต่อระบบกลางสำเร็จ","ok"); setTimeout(close,900); }
+    else { stat.className="statline no"; stat.textContent="○ เชื่อมต่อไม่สำเร็จ — ตรวจสอบว่า Deploy แบบ Anyone และคัดลอกลิงก์ /exec ถูกต้อง"; }
+  });
+}
+
+function logoutStaff(){
+  sessionStorage.removeItem("regis.auth");
+  clearInterval(syncTimer);
+  document.body.dataset.role="";
+  $("#staffView").hidden=true; $("#staffView").innerHTML="";
+  $("#studentView").hidden=false;
+  location.hash="";
+  stuInput.focus();
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+function route(){
+  const staff = location.hash.replace(/^#/,"")==="staff";
+  if(staff){
+    if(sessionStorage.getItem("regis.auth")==="1"){ if($("#staffView").hidden) enterStaff(); }
+    else { $("#studentView").hidden=false; openGate(); }
+  } else {
+    closeGate();
+    if(!$("#staffView").hidden) { /* came back from staff */ document.body.dataset.role=""; $("#staffView").hidden=true; $("#staffView").innerHTML=""; clearInterval(syncTimer); }
+    $("#studentView").hidden=false;
+  }
+}
+window.addEventListener("hashchange", route);
+$("#toStaff").addEventListener("click", ()=>{ /* hashchange handles it */ });
+
+/* ============================================================
+   PDPA CONSENT + ROSTER BOOT (student)
+   ============================================================ */
+function pdpaAccepted(){ return localStorage.getItem("regis.pdpa")===PDPA_VERSION; }
+function openPDPA(onAccept){
+  const mount=$("#pdpaMount");
+  const g=el("div","pdpa");
+  g.innerHTML=`
+    <div class="pdpa-card" role="dialog" aria-modal="true" aria-label="ความยินยอมข้อมูลส่วนบุคคล">
+      <div class="pdpa-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <h2>การคุ้มครองข้อมูลส่วนบุคคล (PDPA)</h2>
+      <p class="lead">ก่อนใช้งานระบบค้นหาบ้านกิจกรรมรับน้อง โปรดอ่านและให้ความยินยอมในการประมวลผลข้อมูลส่วนบุคคลตามรายละเอียดด้านล่าง</p>
+      <ul class="pdpa-list">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>วัตถุประสงค์:</b> ใช้ค้นหาบ้านและกลุ่มกิจกรรมของนักศึกษาใหม่ในกิจกรรมรับน้องเท่านั้น</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>ข้อมูลที่ใช้:</b> ชื่อ-นามสกุล รหัสนักศึกษา บ้านที่สังกัด และหลักสูตร</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>การจัดเก็บ:</b> ข้อมูลถูกเก็บแยกในฐานข้อมูลของผู้จัดกิจกรรม ไม่ได้ฝังในซอร์สโค้ดของเว็บไซต์</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>การเปิดเผย:</b> จะไม่เปิดเผยต่อบุคคลภายนอก และไม่นำไปใช้นอกเหนือจากกิจกรรมรับน้อง</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>ระยะเวลา:</b> ใช้เฉพาะช่วงกิจกรรมรับน้อง เมื่อสิ้นสุดกิจกรรมจะยกเลิกการใช้งานข้อมูล</span></li>
+      </ul>
+      <label class="pdpa-consent">
+        <input type="checkbox" id="pdpaAgree">
+        <span>ฉันได้อ่านและ<b style="color:var(--gem-gold)">ยินยอม</b>ให้ประมวลผลข้อมูลส่วนบุคคลตามวัตถุประสงค์ข้างต้น</span>
+      </label>
+      <button class="btn btn-gold btn-block btn-lg" id="pdpaAccept" style="margin-top:16px" disabled>ยอมรับและเข้าใช้งาน</button>
+      <p class="pdpa-foot">หากไม่ยินยอม กรุณาปิดหน้าเว็บนี้</p>
+    </div>`;
+  mount.innerHTML=""; mount.appendChild(g);
+  document.body.style.overflow="hidden";
+  const chk=$("#pdpaAgree"), btn=$("#pdpaAccept");
+  chk.addEventListener("change", ()=>{ btn.disabled=!chk.checked; });
+  btn.addEventListener("click", ()=>{
+    try{ localStorage.setItem("regis.pdpa", PDPA_VERSION); }catch(_){}
+    mount.innerHTML=""; document.body.style.overflow="";
+    onAccept && onAccept();
+  });
+}
+
+function bootRoster(force){
+  rosterErrorMsg=""; rosterLoading=true; renderStuResults();
+  loadRoster(force).then(res=>{
+    rosterLoading=false;
+    if(!rosterReady){
+      rosterErrorMsg = (res.reason==="no-backend")
+        ? "ระบบยังไม่ได้เชื่อมต่อฐานข้อมูล กรุณาติดต่อเจ้าหน้าที่"
+        : "เชื่อมต่อฐานข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง";
+    }
+    renderStuResults();
+    if(document.body.dataset.role==="staff") staffRender();
+  });
+}
+function bootStudent(){
+  if(location.hash.replace(/^#/,"")==="staff") return;   // หน้าเจ้าหน้าที่มี gate ของตัวเอง
+  const go = ()=>{ bootRoster(); setTimeout(()=>stuInput.focus(),60); };
+  if(!pdpaAccepted()) openPDPA(go); else go();
+}
+
+/* init */
+Store.loadLocal();
+renderTutorial();
+renderStuResults();
+route();
+bootStudent();
+</script>
+</body>
+</html>

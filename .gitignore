@@ -1,0 +1,18 @@
+# ข้อมูลดิบ (PII) — ไม่ commit ขึ้น GitHub
+รายชื่อบ้าน1-12.pdf
+คิวอาร์โค้ดแต่ละบ้าน/
+roster-import.csv
+_embed.json
+
+# build / dev artifacts
+node_modules/
+_shots/
+_*.txt
+*.tgz
+
+# QR lib: keep only the file build.mjs needs
+package/*
+!package/dist/
+package/dist/*
+!package/dist/qrcode.js
+!package/package.json
