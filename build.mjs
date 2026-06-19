@@ -39,4 +39,5 @@ const leftovers = out.match(/__[A-Z_]+__|\/\*__[A-Z_]+__\*\//g);
 if (leftovers) { console.error("Unreplaced placeholders:", leftovers); process.exit(1); }
 
 writeFileSync(new URL("index.html", ROOT), out);
-console.log(`Built index.html  (${(out.length/1024).toFixed(0)} KB)  hash=${pinHash.slice(0,12)}…  backend=${BACKEND_URL?"set (obfuscated)":"(none)"}`);
+console.log(`Built index.html  (${(out.length/1024).toFixed(0)} KB)  backend=${BACKEND_URL?"set (obfuscated)":"(none)"}`);
+console.log(`STAFF_HASH (ตั้งใน Apps Script → Project Settings → Script properties): ${pinHash}`);

@@ -886,39 +886,9 @@ function renderTutorial(){
 const saiLink = $("#saiLink");
 if(saiLink) saiLink.addEventListener("click", ()=>markTutorial("sai"));
 
-let rosterLoading = false, rosterErrorMsg = "";
-function renderStuResults(){
-  const q = stuInput.value;
-  stuClear.hidden = !q;
-  if(!rosterReady){
-    stuHint.hidden = true;
-    if(rosterLoading){
-      stuResults.innerHTML = `<div class="emptystate"><div class="loader" aria-hidden="true"></div>
-        <b>กำลังโหลดข้อมูลรายชื่อ…</b><div>รอสักครู่นะ</div></div>`;
-    } else {
-      stuResults.innerHTML = `<div class="emptystate">
-        <svg class="em-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
-        <b>ยังโหลดข้อมูลไม่ได้</b>
-        <div>${esc(rosterErrorMsg||"ระบบยังไม่ได้เชื่อมต่อฐานข้อมูล")}</div>
-        <button class="btn btn-ghost" id="rosterRetry" style="margin-top:14px">ลองอีกครั้ง</button>
-      </div>`;
-      const rb=$("#rosterRetry"); if(rb) rb.addEventListener("click", ()=>bootRoster(true));
-    }
-    return;
-  }
-  const k = norm(q);
-  if(k.length < 2){ stuResults.innerHTML=""; stuHint.hidden=false; return; }
-  stuHint.hidden = true;
-  const list = searchStudents(q);
-  if(list.length) markTutorial("search");
-  if(!list.length){
-    stuResults.innerHTML = `<div class="emptystate">
-      <svg class="em-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-      <b>ไม่พบข้อมูล “${esc(q)}”</b>
-      <div>ลองตรวจสอบรหัสนักศึกษาอีกครั้ง หรือค้นด้วยชื่อจริง</div>
-    </div>`;
-    return;
-  }
+let searchSeq = 0;
+let rosterLoading = false;   // ใช้ในหน้าเจ้าหน้าที่ระหว่างโหลดรายชื่อ
+function renderRows(list){
   stuResults.innerHTML = "";
   list.forEach((s,i)=>{
     const row = el("button","res-row");
@@ -933,8 +903,39 @@ function renderStuResults(){
     stuResults.appendChild(row);
   });
 }
-stuInput.addEventListener("input", debounce(renderStuResults, 90));
-stuInput.addEventListener("keydown", e=>{ if(e.key==="Enter"){ const l=searchStudents(stuInput.value); if(l.length) openDetail(l[0]); }});
+async function renderStuResults(){
+  const q = stuInput.value;
+  stuClear.hidden = !q;
+  const k = norm(q);
+  if(k.length < 2){ stuResults.innerHTML=""; stuHint.hidden=false; return; }
+  stuHint.hidden = true;
+  const seq = ++searchSeq;
+  stuResults.innerHTML = `<div class="emptystate"><div class="loader" aria-hidden="true"></div><b>กำลังค้นหา…</b></div>`;
+  let list;
+  try{ list = await apiFind(q); }
+  catch(e){
+    if(seq!==searchSeq) return;   // มีการพิมพ์ใหม่ระหว่างรอ
+    stuResults.innerHTML = `<div class="emptystate">
+      <svg class="em-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      <b>${e.message==="no-backend"?"ระบบยังไม่ได้เชื่อมต่อฐานข้อมูล":"ค้นหาไม่สำเร็จ ลองใหม่อีกครั้ง"}</b>
+      <div>${e.message==="no-backend"?"กรุณาติดต่อเจ้าหน้าที่":"ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"}</div>
+    </div>`;
+    return;
+  }
+  if(seq!==searchSeq) return;     // ผลลัพธ์เก่า ทิ้งไป
+  if(list.length) markTutorial("search");
+  if(!list.length){
+    stuResults.innerHTML = `<div class="emptystate">
+      <svg class="em-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      <b>ไม่พบข้อมูล “${esc(q)}”</b>
+      <div>ลองตรวจสอบรหัสนักศึกษาอีกครั้ง หรือค้นด้วยชื่อจริง</div>
+    </div>`;
+    return;
+  }
+  renderRows(list);
+}
+stuInput.addEventListener("input", debounce(renderStuResults, 240));
+stuInput.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); apiFind(stuInput.value).then(l=>{ if(l.length) openDetail(l[0]); }).catch(()=>{}); }});
 stuClear.addEventListener("click", ()=>{ stuInput.value=""; stuInput.focus(); renderStuResults(); });
 
 /* result detail */
@@ -995,6 +996,8 @@ const Store = {
   rev: 0,
   backendUrl(){ return localStorage.getItem(LS_BACKEND) || CONFIG.backendUrl || ""; },
   setBackend(u){ if(u) localStorage.setItem(LS_BACKEND,u); else localStorage.removeItem(LS_BACKEND); },
+  token(){ return sessionStorage.getItem("regis.token") || ""; },   // รหัสเจ้าหน้าที่ (อยู่ในหน่วยความจำชั่วคราวเท่านั้น)
+  setToken(t){ if(t) sessionStorage.setItem("regis.token",t); else sessionStorage.removeItem("regis.token"); },
   online: false,
   loadLocal(){ try{ this.data = JSON.parse(localStorage.getItem(LS_DATA)||"{}"); }catch(_){ this.data={}; } },
   saveLocal(){ localStorage.setItem(LS_DATA, JSON.stringify(this.data)); },
@@ -1008,24 +1011,41 @@ const Store = {
 
 async function apiList(){
   const url = Store.backendUrl(); if(!url) throw new Error("no-backend");
-  const r = await fetch(url+"?action=list&t="+Date.now(), { method:"GET" });
+  const r = await fetch(url+"?action=list&token="+encodeURIComponent(Store.token())+"&t="+Date.now(), { method:"GET" });
   if(!r.ok) throw new Error("http "+r.status);
-  return r.json();    // { ok, data:{id:{d1,d2,out,t}} }
+  const j = await r.json();
+  if(j && j.error==="unauthorized") throw new Error("unauthorized");
+  return j;    // { ok, data:{id:{d1,d2,out,t}} }
 }
 async function apiMark(id, slot, val, ts){
   const url = Store.backendUrl(); if(!url) throw new Error("no-backend");
   const r = await fetch(url, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body: JSON.stringify({ action:"mark", id, slot, val:val?1:0, t: ts || Date.now() }) });
+    body: JSON.stringify({ action:"mark", id, slot, val:val?1:0, t: ts || Date.now(), token: Store.token() }) });
   if(!r.ok) throw new Error("http "+r.status);
   return r.json();
 }
 async function apiRoster(){
   const url = Store.backendUrl(); if(!url) throw new Error("no-backend");
-  const r = await fetch(url+"?action=roster&t="+Date.now(), { method:"GET" });
+  const r = await fetch(url+"?action=roster&token="+encodeURIComponent(Store.token())+"&t="+Date.now(), { method:"GET" });
+  if(!r.ok) throw new Error("http "+r.status);
+  const j = await r.json();
+  if(j && j.error==="unauthorized") throw new Error("unauthorized");
+  if(!j.ok || !Array.isArray(j.rows)) throw new Error("bad-response");
+  return j.rows;    // [[id,prefix,first,last,house,program], ...]
+}
+/* ค้นหาสาธารณะ — ส่งคำค้นไปให้เซิร์ฟเวอร์ คืนเฉพาะรายการที่ตรง (หน้านักศึกษาไม่โหลดรายชื่อทั้งหมด) */
+async function apiFind(q){
+  const url = Store.backendUrl(); if(!url) throw new Error("no-backend");
+  const r = await fetch(url+"?action=find&q="+encodeURIComponent(q)+"&t="+Date.now(), { method:"GET" });
   if(!r.ok) throw new Error("http "+r.status);
   const j = await r.json();
   if(!j.ok || !Array.isArray(j.rows)) throw new Error("bad-response");
-  return j.rows;    // [[id,prefix,first,last,house,program], ...]
+  return j.rows.map(r=>{
+    const id=String(r[0]).trim(), prefix=(r[1]||"").trim(), first=(r[2]||"").trim(),
+          last=(r[3]||"").trim(), house=parseInt(r[4],10)||0, program=(r[5]||"").trim();
+    return { id, prefix, first, last, house, program,
+      name:((prefix?prefix+" ":"")+first+" "+last).trim(), fullname:(first+" "+last).trim() };
+  });
 }
 /* โหลดรายชื่อจากฐานข้อมูล (Google Sheet) + แคชในเครื่องเพื่อความเร็ว/เสถียร */
 async function loadRoster(force){
@@ -1185,6 +1205,7 @@ function openGate(){
     if(!val){ field.focus(); return; }
     const h = await sha256hex(val);
     if(h===CONFIG.pinHash){
+      Store.setToken(val);                        // ใช้รหัสที่กรอกเป็นโทเคนส่งให้เซิร์ฟเวอร์ตรวจซ้ำ
       sessionStorage.setItem("regis.auth","1");
       mount.innerHTML=""; enterStaff();
     } else {
@@ -1491,6 +1512,7 @@ function openSettings(){
 
 function logoutStaff(){
   sessionStorage.removeItem("regis.auth");
+  Store.setToken("");
   clearInterval(syncTimer);
   document.body.dataset.role="";
   $("#staffView").hidden=true; $("#staffView").innerHTML="";
@@ -1505,7 +1527,7 @@ function logoutStaff(){
 function route(){
   const staff = location.hash.replace(/^#/,"")==="staff";
   if(staff){
-    if(sessionStorage.getItem("regis.auth")==="1"){ if($("#staffView").hidden) enterStaff(); }
+    if(sessionStorage.getItem("regis.auth")==="1" && Store.token()){ if($("#staffView").hidden) enterStaff(); }
     else { $("#studentView").hidden=false; openGate(); }
   } else {
     closeGate();
@@ -1553,22 +1575,10 @@ function openPDPA(onAccept){
   });
 }
 
-function bootRoster(force){
-  rosterErrorMsg=""; rosterLoading=true; renderStuResults();
-  loadRoster(force).then(res=>{
-    rosterLoading=false;
-    if(!rosterReady){
-      rosterErrorMsg = (res.reason==="no-backend")
-        ? "ระบบยังไม่ได้เชื่อมต่อฐานข้อมูล กรุณาติดต่อเจ้าหน้าที่"
-        : "เชื่อมต่อฐานข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง";
-    }
-    renderStuResults();
-    if(document.body.dataset.role==="staff") staffRender();
-  });
-}
 function bootStudent(){
   if(location.hash.replace(/^#/,"")==="staff") return;   // หน้าเจ้าหน้าที่มี gate ของตัวเอง
-  const go = ()=>{ bootRoster(); setTimeout(()=>stuInput.focus(),60); };
+  // หน้านักศึกษาไม่โหลดรายชื่อทั้งหมดอีกต่อไป — ค้นหาผ่านเซิร์ฟเวอร์ทีละคำ (กันข้อมูลรั่ว)
+  const go = ()=>{ setTimeout(()=>stuInput.focus(),60); };
   if(!pdpaAccepted()) openPDPA(go); else go();
 }
 

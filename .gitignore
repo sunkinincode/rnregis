@@ -4,6 +4,9 @@
 roster-import.csv
 _embed.json
 
+# ไฟล์ที่ผู้จัดตั้งค่า/วางเองในบริการอื่น (เช่น วางใน Google Apps Script) — ไม่ขึ้น GitHub
+apps-script/
+
 # build / dev artifacts
 node_modules/
 _shots/
