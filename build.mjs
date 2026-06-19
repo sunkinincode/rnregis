@@ -30,9 +30,10 @@ const build = new Date().toISOString().slice(0, 10);
 let out = template
   .replace("/*__QRLIB__*/", () => qrlib)
   .replace("/*__HOUSES__*/", () => houses)
-  .replace("__PIN_HASH__", pinHash)
   .replace("__BACKEND_ENC__", () => backendEnc)
   .replace("__BUILD__", build);
+// หมายเหตุ: ไม่ฝัง pinHash ในไฟล์อีกต่อไป — เซิร์ฟเวอร์ (STAFF_HASH) เป็นผู้ตรวจรหัสผ่าน
+// แต่ยังคำนวณ pinHash ไว้เพื่อพิมพ์ค่าให้นำไปตั้ง STAFF_HASH
 
 // sanity: no leftover placeholders
 const leftovers = out.match(/__[A-Z_]+__|\/\*__[A-Z_]+__\*\//g);

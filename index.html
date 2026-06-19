@@ -3070,8 +3070,7 @@ var qrcode = function() {
    ============================================================ */
 const CONFIG = {
   backendEnc: "GhoGFRRTXF0dERcOGQdcCR0KAAUWXA0dCEgEEhEcHRZIGlwzJRQcBAsKClwFBiZRP0U/KCsLGSEIWhggAxElEyY4EzEYBjYpLStVIzE/BCINPxBCBzsZVTBdGiUNICMiCzkaHxcRCi0hIyBdAB8MEA==",     // ลิงก์ Apps Script (บดบังด้วย XOR+base64 — ไม่ใช่ความปลอดภัยจริง แค่ไม่ให้เห็นตรงๆ)
-  pinHash:    "6ac2d921d6403b55c38f974ed737d02098362f8251b53b60925f7c14fb13ddc2",        // sha-256 ของรหัสผ่านเจ้าหน้าที่
-  build:      "2026-06-19"
+  build:      "2026-06-19"             // หมายเหตุ: ไม่ฝังแฮชรหัสผ่านในไฟล์แล้ว — เซิร์ฟเวอร์เป็นผู้ตรวจรหัสผ่าน
 };
 function _deobf(b64){
   if(!b64) return "";
@@ -3125,10 +3124,6 @@ function fmtTs(ms){ if(!ms) return ""; const d=new Date(+ms); if(isNaN(d)) retur
   const p=n=>("0"+n).slice(-2);
   return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds()); }
 
-async function sha256hex(str){
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
-}
 function qrSvg(text){
   const qr = qrcode(0, "M"); qr.addData(text); qr.make();
   return qr.createSvgTag({ cellSize:5, margin:0, scalable:true });
@@ -3500,15 +3495,24 @@ function openGate(){
   async function submit(){
     const val = field.value;
     if(!val){ field.focus(); return; }
-    const h = await sha256hex(val);
-    if(h===CONFIG.pinHash){
-      Store.setToken(val);                        // ใช้รหัสที่กรอกเป็นโทเคนส่งให้เซิร์ฟเวอร์ตรวจซ้ำ
+    const btn = $("#gateSubmit");
+    btn.disabled = true; btn.textContent = "กำลังตรวจสอบ…"; err.textContent = ""; g.classList.remove("err");
+    Store.setToken(val);                          // ส่งรหัสที่กรอกให้เซิร์ฟเวอร์ตรวจ (ไม่มีการเช็คในไฟล์อีกต่อไป)
+    try{
+      await apiList();                            // ผ่านก็ต่อเมื่อเซิร์ฟเวอร์ยืนยันรหัสถูก
       sessionStorage.setItem("regis.auth","1");
       mount.innerHTML=""; enterStaff();
-    } else {
-      g.classList.add("err"); err.textContent="รหัสผ่านไม่ถูกต้อง";
-      field.select();
-      setTimeout(()=>g.classList.remove("err"), 500);
+    }catch(e){
+      Store.setToken("");
+      btn.disabled = false; btn.textContent = "เข้าสู่ระบบ";
+      if(e.message==="unauthorized"){
+        g.classList.add("err"); err.textContent="รหัสผ่านไม่ถูกต้อง"; field.select();
+        setTimeout(()=>g.classList.remove("err"), 500);
+      } else if(e.message==="no-backend"){
+        err.textContent="ยังไม่ได้เชื่อมต่อระบบกลาง — ติดต่อผู้ดูแล";
+      } else {
+        err.textContent="เชื่อมต่อไม่สำเร็จ ลองใหม่อีกครั้ง";
+      }
     }
   }
   $("#gateForm").addEventListener("submit", e=>{ e.preventDefault(); submit(); });
@@ -3811,6 +3815,9 @@ function logoutStaff(){
   sessionStorage.removeItem("regis.auth");
   Store.setToken("");
   clearInterval(syncTimer);
+  // ล้างข้อมูลที่แคชในเครื่องนี้ กันข้อมูลค้างบนเครื่องที่ใช้ร่วมกัน
+  try{ localStorage.removeItem(LS_ROSTER); localStorage.removeItem(LS_DATA); }catch(_){}
+  STUDENTS = []; BY_ID = new Map(); rosterReady = false; Store.data = {};
   document.body.dataset.role="";
   $("#staffView").hidden=true; $("#staffView").innerHTML="";
   $("#studentView").hidden=false;
