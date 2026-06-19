@@ -772,10 +772,19 @@ body:not([data-role="staff"]){
    CONFIG + DATA (injected at build)
    ============================================================ */
 const CONFIG = {
-  backendUrl: "__BACKEND_URL__",     // Google Apps Script Web App URL (not a secret). May be overridden per-device in settings.
-  pinHash:    "__PIN_HASH__",        // sha-256 of staff PIN
+  backendEnc: "__BACKEND_ENC__",     // ลิงก์ Apps Script (บดบังด้วย XOR+base64 — ไม่ใช่ความปลอดภัยจริง แค่ไม่ให้เห็นตรงๆ)
+  pinHash:    "__PIN_HASH__",        // sha-256 ของรหัสผ่านเจ้าหน้าที่
   build:      "__BUILD__"
 };
+function _deobf(b64){
+  if(!b64) return "";
+  try{
+    const x = atob(b64), key = "rnregis"; let s = "";
+    for(let i=0;i<x.length;i++) s += String.fromCharCode(x.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    return s;
+  }catch(_){ return ""; }
+}
+CONFIG.backendUrl = _deobf(CONFIG.backendEnc);   // ถอดบดบังตอนรันไทม์
 const HOUSES = /*__HOUSES__*/;   // {"1": lineUrl, ...} — ไม่ใช่ข้อมูลส่วนบุคคล
 const PDPA_VERSION = "1";
 const CHECKPOINTS = [
