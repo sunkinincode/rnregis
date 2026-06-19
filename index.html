@@ -3070,7 +3070,7 @@ var qrcode = function() {
    ============================================================ */
 const CONFIG = {
   backendEnc: "GhoGFRRTXF0dERcOGQdcCR0KAAUWXA0dCEgEEhEcHRZIGlwzJRQcBAsKClwFBiZRP0U/KCsLGSEIWhggAxElEyY4EzEYBjYpLStVIzE/BCINPxBCBzsZVTBdGiUNICMiCzkaHxcRCi0hIyBdAB8MEA==",     // ลิงก์ Apps Script (บดบังด้วย XOR+base64 — ไม่ใช่ความปลอดภัยจริง แค่ไม่ให้เห็นตรงๆ)
-  pinHash:    "6ac2d921d6403b55c38f974ed737d02098362f8251b53b60925f7c14fb13ddc2",        // sha-256 ของรหัสผ่านเจ้าหน้าที่
+  pinHash:    "996a66481cabf0cbef3d77d73de3c572976c2ab477ce714528deb76f16019c33",        // sha-256 ของรหัสผ่านเจ้าหน้าที่
   build:      "2026-06-19"
 };
 function _deobf(b64){
@@ -3350,7 +3350,8 @@ function setSyncState(state){    // online|offline|syncing|local
   pill.querySelector(".lbl").textContent = label;
 }
 function mergeServer(serverData){
-  // server is source of truth for confirmed marks; keep any local-only newer marks
+  // เซิร์ฟเวอร์เป็นค่าหลักของรายการที่ "ยืนยันแล้ว" — แต่รายการที่เพิ่งกดในเครื่อง
+  // และยังรอเซิร์ฟเวอร์ยืนยัน (ทั้งกดเช็คและกดยกเลิก) ให้ยึดค่าในเครื่องไว้ก่อน
   const merged = {};
   for(const id in serverData){
     merged[id] = Object.assign({}, serverData[id]);
@@ -3360,16 +3361,39 @@ function mergeServer(serverData){
     const loc = Store.data[id];
     if(!merged[id]) merged[id] = { ts:{} };
     merged[id].ts = merged[id].ts || {};
-    for(const s of SLOTS){
-      // if local has a mark the server lacks and it's recent/pending, keep it (and its timestamp)
-      if(loc[s] && !merged[id][s] && loc._pending && loc._pending[s]){
-        merged[id][s]=1;
-        if(loc.ts && loc.ts[s]) merged[id].ts[s] = loc.ts[s];
+    const pend = loc._pending;
+    if(pend){
+      const stillPending = {};
+      for(const s of SLOTS){
+        const p = pend[s]; if(!p) continue;
+        const want = p.val ? 1 : 0;
+        // ยึดค่าที่เพิ่งกดในเครื่องเป็นหลัก (กันค่าค้างเก่าจากเซิร์ฟเวอร์ทับการกดยกเลิก)
+        merged[id][s] = want;
+        if(want){ if(p.t) merged[id].ts[s] = p.t; }
+        else { delete merged[id].ts[s]; }
+        const serverVal = (serverData[id] && serverData[id][s]) ? 1 : 0;
+        if(serverVal !== want) stillPending[s] = p;   // เซิร์ฟเวอร์ยังไม่สะท้อนค่า → รอต่อ
       }
+      if(Object.keys(stillPending).length) merged[id]._pending = stillPending;
     }
-    if(loc._pending) merged[id]._pending = loc._pending;
   }
   Store.data = merged;
+}
+const _inflight = new Set();
+function retryPending(){   // ส่งซ้ำรายการที่ยังไม่ได้รับการยืนยันจากเซิร์ฟเวอร์
+  if(!Store.backendUrl()) return;
+  const now = Date.now();
+  for(const id in Store.data){
+    const pend = Store.data[id]._pending; if(!pend) continue;
+    for(const s of SLOTS){
+      const p = pend[s]; if(!p) continue;
+      const key = id+"|"+s;
+      if(now-(p.t||0) > 4000 && !_inflight.has(key)){
+        _inflight.add(key);
+        apiMark(id, s, p.val, p.t).finally(()=>_inflight.delete(key));
+      }
+    }
+  }
 }
 async function syncNow(){
   if(syncing) return; if(!Store.backendUrl()) { setSyncState("local"); return; }
@@ -3384,6 +3408,7 @@ async function syncNow(){
       mergeServer(sd);
       Store.online=true; Store.saveLocal(); setSyncState("online");
       if(window.__staffRender) window.__staffRender();
+      retryPending();
     } else throw new Error("bad");
   }catch(e){
     Store.online=false; setSyncState(Store.backendUrl()?"offline":"local");
@@ -3397,13 +3422,13 @@ async function markAttendance(id, slot, val){
   r[slot] = val?1:0; r.t = now;
   r.ts = r.ts || {};
   if(val) r.ts[slot] = now; else delete r.ts[slot];   // เก็บเวลาที่กดเช็คของช่วงนั้น
-  r._pending = r._pending || {}; r._pending[slot]=true;
+  r._pending = r._pending || {}; r._pending[slot]={ val: val?1:0, t: now };
   Store.saveLocal();
   if(window.__staffRender) window.__staffRender();
   if(Store.backendUrl()){
     try{
       await apiMark(id, slot, val, now);
-      if(r._pending){ delete r._pending[slot]; }
+      // อย่าเพิ่งลบสถานะรอ — ให้ syncNow ยืนยันจากเซิร์ฟเวอร์ก่อน กันค่าค้างเก่าทับ
       Store.online=true; setSyncState("online");
     }catch(e){
       Store.online=false; setSyncState("offline");
