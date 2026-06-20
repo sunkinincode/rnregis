@@ -30,3 +30,7 @@ out/
 *.tgz
 next-env.d.ts
 .DS_Store
+
+# ── ข้อมูลติดต่อสายรหัส (PII) ──
+*.xlsx
+supabase/seed-sai.sql

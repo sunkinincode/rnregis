@@ -1,6 +1,6 @@
 "use client";
 import { Student, AttMap, rowToRec, makeName } from "./constants";
-import { SaiContact } from "./sai";
+import { SaiLine } from "./sai";
 
 async function jget(url: string) {
   const r = await fetch(url, { cache: "no-store" });
@@ -66,21 +66,15 @@ export async function staffMark(id: string, slot: string, val: boolean) {
 }
 
 // ── สายรหัส ──
-export async function saiSubmit(payload: {
-  studentId: string;
-  name: string;
-  nickname: string;
-  contact: string;
-  message: string;
-}): Promise<{ role: string; label: string }> {
+export async function saiSubmit(payload: { studentId: string; contact: string }): Promise<{ label: string; year: number }> {
   const j = await jpost("/api/sai/submit", payload);
-  return { role: j.role, label: j.label };
+  return { label: j.label, year: j.year };
 }
-export async function saiList(): Promise<SaiContact[]> {
+export async function saiList(): Promise<SaiLine[]> {
   const j = await jpost("/api/sai/list", {});
-  return (j.rows || []) as SaiContact[];
+  return (j.rows || []) as SaiLine[];
 }
-export async function saiLookup(studentId: string): Promise<{ saiKey: string; rows: SaiContact[] }> {
+export async function saiLookup(studentId: string): Promise<{ saiKey: string; you: number; line: SaiLine | null }> {
   const j = await jpost("/api/sai/lookup", { studentId });
-  return { saiKey: j.saiKey, rows: (j.rows || []) as SaiContact[] };
+  return { saiKey: j.saiKey, you: j.you, line: j.line };
 }

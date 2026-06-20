@@ -12,10 +12,9 @@ export async function POST(req: NextRequest) {
   try {
     const supa = supabaseAdmin();
     const { data, error } = await supa
-      .from("sai_contacts")
+      .from("sai_lines")
       .select("*")
-      .order("year", { ascending: false })
-      .order("updated_at", { ascending: false })
+      .order("sai_key", { ascending: true })
       .limit(5000);
     if (error) throw error;
     return NextResponse.json({ ok: true, rows: data || [] });

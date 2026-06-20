@@ -13,7 +13,8 @@
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "seed": "node supabase/seed-students.mjs",
     "sheet:sql": "node supabase/sheet-to-sql.mjs",
-    "roster:sql": "node supabase/roster-to-sql.mjs"
+    "roster:sql": "node supabase/roster-to-sql.mjs",
+    "sai:sql": "node supabase/contacts-to-sql.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
@@ -30,6 +31,7 @@
     "@types/react-dom": "^19.0.0",
     "esbuild": "^0.28.1",
     "typescript": "^5.6.3",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.0.0",
+    "xlsx": "^0.18.5"
   }
 }

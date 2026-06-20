@@ -703,3 +703,9 @@ body:not([data-role="staff"]){
 .sai-resitem .res-msg{ margin-top:5px; font-size:.86rem; color:var(--ink-2); line-height:1.5; }
 .sai-keychip{ display:inline-block; font-weight:700; background:var(--surface-2); color:var(--ink);
   padding:2px 10px; border-radius:var(--r-full); font-variant-numeric:tabular-nums; }
+
+/* ผลลัพธ์สายรหัส: ไฮไลต์แถวของตัวเอง + ช่องว่าง */
+.sai-resitem.me{ border-color:var(--gem-gold); box-shadow:0 0 0 1.5px oklch(0.84 0.14 88 / .6); background:oklch(0.98 0.03 88); }
+.sai-resitem.empty{ opacity:.62; }
+.res-you{ font-size:.72rem; font-weight:700; color:oklch(0.3 0.06 70); background:var(--gem-gold);
+  padding:2px 10px; border-radius:var(--r-full); margin-left:auto; }

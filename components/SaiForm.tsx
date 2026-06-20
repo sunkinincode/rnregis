@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import { saiInfo, saiKey, SaiContact } from "@/lib/sai";
+import { saiInfo, SAI_YEARS, SaiLine } from "@/lib/sai";
 import { saiSubmit, saiLookup } from "@/lib/client";
 import { IconHouse, IconCheck, IconSearch } from "./icons";
 
@@ -55,7 +55,7 @@ export default function SaiForm() {
           </div>
 
           <div className="sai-card">
-            {mode === "submit" ? <SubmitPanel /> : <LookupPanel goSubmit={() => setMode("submit")} />}
+            {mode === "submit" ? <SubmitPanel /> : <LookupPanel />}
           </div>
         </div>
       </main>
@@ -67,9 +67,6 @@ export default function SaiForm() {
 function SubmitPanel() {
   const [studentId, setStudentId] = React.useState("");
   const [contact, setContact] = React.useState("");
-  const [name, setName] = React.useState("");
-  const [nickname, setNickname] = React.useState("");
-  const [message, setMessage] = React.useState("");
   const [consent, setConsent] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState("");
@@ -78,7 +75,7 @@ function SubmitPanel() {
   const info = saiInfo(studentId);
   const idTyped = studentId.trim().length > 0;
   const idValid = !!info.role;
-  const canSubmit = idValid && contact.trim() && consent && !busy;
+  const canSubmit = idValid && !!contact.trim() && consent && !busy;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +83,7 @@ function SubmitPanel() {
     setBusy(true);
     setErr("");
     try {
-      const res = await saiSubmit({ studentId: studentId.trim(), name: name.trim(), nickname: nickname.trim(), contact: contact.trim(), message: message.trim() });
+      const res = await saiSubmit({ studentId: studentId.trim(), contact: contact.trim() });
       setDone({ label: res.label });
     } catch (e: any) {
       setBusy(false);
@@ -103,8 +100,8 @@ function SubmitPanel() {
       <div className="sai-done">
         <div className="sai-done-ico"><IconCheck size={30} /></div>
         <h2>บันทึกเรียบร้อย!</h2>
-        <p>ลงทะเบียนในฐานะ <b>{done.label}</b> แล้ว · แก้ไขได้โดยกรอกรหัสเดิมอีกครั้ง<br />ตอนนี้ดู "สายรหัสของฉัน" ได้แล้ว</p>
-        <button className="btn btn-gold btn-block btn-lg" style={{ marginTop: 18 }} onClick={() => { setDone(null); setContact(""); }}>
+        <p>ลงในฐานะ <b>{done.label}</b> แล้ว · แก้ไขได้โดยกรอกรหัสเดิมอีกครั้ง<br />แตะแท็บ "ดูสายรหัสของฉัน" เพื่อดูทั้งสายได้เลย</p>
+        <button className="btn btn-gold btn-block btn-lg" style={{ marginTop: 18 }} onClick={() => { setDone(null); setStudentId(""); setContact(""); setConsent(false); }}>
           กรอกอีกคน
         </button>
       </div>
@@ -126,23 +123,8 @@ function SubmitPanel() {
 
       <div className="field">
         <label>ช่องทางติดต่อ</label>
-        <div className="desc" style={{ margin: "0 0 8px" }}>Line ID / Instagram / เบอร์โทร — อันไหนก็ได้ที่สะดวก</div>
-        <input type="text" placeholder="เช่น Line: myid หรือ IG: @myig" value={contact} onChange={(e) => setContact(e.target.value)} maxLength={200} />
-      </div>
-
-      <div className="field">
-        <label>ชื่อ-นามสกุล <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>(ไม่บังคับ)</span></label>
-        <input type="text" placeholder="ชื่อจริง นามสกุล" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} />
-      </div>
-
-      <div className="field">
-        <label>ชื่อเล่น <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>(ไม่บังคับ)</span></label>
-        <input type="text" placeholder="ชื่อเล่น" value={nickname} onChange={(e) => setNickname(e.target.value)} maxLength={60} />
-      </div>
-
-      <div className="field">
-        <label>ข้อความถึงสายรหัส <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>(ไม่บังคับ)</span></label>
-        <textarea placeholder="อยากบอกอะไรพี่/น้องรหัสไหม…" value={message} onChange={(e) => setMessage(e.target.value)} maxLength={500} />
+        <div className="desc" style={{ margin: "0 0 8px" }}>Instagram / Facebook / Line / เบอร์โทร — อันไหนก็ได้ที่สะดวก</div>
+        <input type="text" placeholder="เช่น ig: myname หรือ Line: myid" value={contact} onChange={(e) => setContact(e.target.value)} maxLength={200} />
       </div>
 
       <label className="sai-consent">
@@ -160,12 +142,13 @@ function SubmitPanel() {
 }
 
 /* ───────────────── ดูสายรหัสของฉัน ───────────────── */
-function LookupPanel({ goSubmit }: { goSubmit: () => void }) {
+function LookupPanel() {
   const [id, setId] = React.useState("");
   const [busy, setBusy] = React.useState(false);
-  const [state, setState] = React.useState<"idle" | "bad" | "notreg" | "fail" | "ok">("idle");
-  const [rows, setRows] = React.useState<SaiContact[]>([]);
-  const [key, setKey] = React.useState("");
+  const [state, setState] = React.useState<"idle" | "bad" | "fail" | "ok">("idle");
+  const [line, setLine] = React.useState<SaiLine | null>(null);
+  const [saiKey, setSaiKey] = React.useState("");
+  const [you, setYou] = React.useState(0);
 
   const info = saiInfo(id);
 
@@ -175,23 +158,24 @@ function LookupPanel({ goSubmit }: { goSubmit: () => void }) {
     setBusy(true);
     try {
       const res = await saiLookup(id.trim());
-      setRows(res.rows);
-      setKey(res.saiKey);
+      setLine(res.line);
+      setSaiKey(res.saiKey);
+      setYou(res.you);
       setState("ok");
     } catch (e: any) {
-      if (e?.message === "not-registered") setState("notreg");
-      else if (e?.message === "bad-id") setState("bad");
-      else setState("fail");
+      setState(e?.message === "bad-id" ? "bad" : "fail");
     } finally {
       setBusy(false);
     }
   };
 
+  const filled = line ? SAI_YEARS.filter((y) => (line as any)[y.col]).length : 0;
+
   return (
     <div className="sai-form">
       <div className="field">
         <label>รหัสนักศึกษาของคุณ</label>
-        <div className="desc" style={{ margin: "0 0 8px" }}>ใส่รหัสตัวเอง เพื่อดูพี่/น้องในสายเดียวกัน (เลข 3 ตัวท้ายตรงกัน)</div>
+        <div className="desc" style={{ margin: "0 0 8px" }}>ใส่รหัสตัวเอง เพื่อดูช่องทางติดต่อพี่/น้องในสายเดียวกัน (เลข 3 ตัวท้ายตรงกัน)</div>
         <form onSubmit={run} style={{ display: "flex", gap: 8 }}>
           <input type="text" inputMode="numeric" placeholder="เช่น 6910210001" value={id}
             onChange={(e) => { setId(e.target.value.replace(/[^0-9]/g, "")); setState("idle"); }} maxLength={10} style={{ flex: 1 }} />
@@ -203,34 +187,28 @@ function LookupPanel({ goSubmit }: { goSubmit: () => void }) {
 
       {state === "bad" && <div className="sai-note warn">รหัสไม่ถูกต้อง — ต้องขึ้นต้น 66–69 และมี 10 หลัก</div>}
       {state === "fail" && <div className="sai-note warn">ค้นหาไม่สำเร็จ ลองใหม่อีกครั้ง</div>}
-      {state === "notreg" && (
-        <div className="sai-note warn">
-          ยังไม่พบข้อมูลของคุณในระบบ — ต้อง<b>ฝากช่องทางติดต่อของตัวเองก่อน</b> ถึงจะดูสายรหัสได้
-          <div style={{ marginTop: 10 }}>
-            <button className="btn btn-gold" onClick={goSubmit}>ไปฝากช่องทางติดต่อ →</button>
-          </div>
-        </div>
-      )}
       {state === "ok" && (
-        rows.length === 0 ? (
-          <div className="sai-note">ยังไม่มีใครในสายของคุณ (เลขท้าย <span className="sai-keychip">{key}</span>) ฝากช่องทางติดต่อไว้ ลองกลับมาดูใหม่ภายหลังนะ</div>
+        !line || filled === 0 ? (
+          <div className="sai-note">ยังไม่มีใครในสายของคุณ (เลขท้าย <span className="sai-keychip">{saiKey}</span>) กรอกช่องทางติดต่อ — ลองชวนกันมากรอก แล้วกลับมาดูใหม่นะ</div>
         ) : (
           <>
-            <div className="sai-note">สายรหัสเลขท้าย <span className="sai-keychip">{key}</span> · พบ {rows.length} คน</div>
+            <div className="sai-note">สายรหัสเลขท้าย <span className="sai-keychip">{saiKey}</span></div>
             <div className="sai-reslist">
-              {rows.map((r) => (
-                <div className="sai-resitem" key={r.student_id}>
-                  <div className="res-top">
-                    <span className={"sai-badge " + r.role} style={{ marginTop: 0 }}>
-                      {r.role === "junior" ? "🌱 น้องรหัส" : "⭐ พี่รหัส"} · ปี {69 - r.year + 1}
-                    </span>
-                    {r.name && <span className="res-nm">{r.name}{r.nickname ? " (" + r.nickname + ")" : ""}</span>}
-                    <span className="res-id tnum">{r.student_id}</span>
+              {SAI_YEARS.map((y) => {
+                const c = (line as any)[y.col] as string | null;
+                const isYou = y.year === you;
+                return (
+                  <div className={"sai-resitem" + (isYou ? " me" : "") + (c ? "" : " empty")} key={y.year}>
+                    <div className="res-top">
+                      <span className={"sai-badge " + (y.year === 69 ? "junior" : "senior")} style={{ marginTop: 0 }}>
+                        {y.emoji} {y.label}
+                      </span>
+                      {isYou && <span className="res-you">คุณ</span>}
+                    </div>
+                    {c ? <div className="res-contact">📇 {c}</div> : <div className="res-msg">— ยังไม่ได้กรอก —</div>}
                   </div>
-                  <div className="res-contact">📇 {r.contact}</div>
-                  {r.message && <div className="res-msg">“{r.message}”</div>}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )

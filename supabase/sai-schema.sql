@@ -1,33 +1,27 @@
 -- ============================================================
---  สายรหัส — ตารางเก็บช่องทางติดต่อ (แทน Google Sheet)
+--  สายรหัส — ตาราง "สาย" (1 แถว = 1 สายรหัส คีย์ด้วยเลขท้าย 3 ตัว)
+--  เก็บช่องทางติดต่อของแต่ละชั้นปีในสายนั้น (รหัส 69/68/67/66)
 --  วางใน Supabase → SQL Editor → Run
 --
---  ⚠️ ถ้าเคยรันเวอร์ชันก่อนหน้าแล้ว ไฟล์นี้จะ DROP ตารางเดิมทิ้งก่อน
---     (ตารางนี้ยังไม่มีข้อมูลจริง — ถ้ามีข้อมูลแล้วให้สำรองก่อน)
+--  ⚠️ DROP ตารางเดิมทิ้งก่อน (ถ้ามีข้อมูลจริงให้สำรองก่อน)
 -- ============================================================
 
-drop table if exists public.sai_contacts cascade;
+drop table if exists public.sai_contacts cascade;   -- ของเวอร์ชันก่อน (ถ้ามี)
+drop table if exists public.sai_lines cascade;
 
-create table public.sai_contacts (
-  student_id text primary key
-    check (student_id ~ '^[0-9]{10}$' and left(student_id, 2) in ('66','67','68','69')),
-  contact    text not null,                  -- ช่องทางติดต่อ (บังคับ)
-  name       text,                           -- ชื่อ-นามสกุล (ไม่บังคับ)
-  nickname   text,                           -- ชื่อเล่น (ไม่บังคับ)
-  message    text,                           -- ข้อความ (ไม่บังคับ)
-  -- ปี/บทบาท คำนวณจากเลขขึ้นต้นรหัสอัตโนมัติ → ตอน import ใส่แค่ student_id + contact ก็พอ
-  year int  generated always as (left(student_id, 2)::int) stored,
-  role text generated always as (case when left(student_id, 2) = '69' then 'junior' else 'senior' end) stored,
-  -- เลข 3 ตัวท้าย = กุญแจสายรหัส (คนสายเดียวกันตรงกัน)
-  sai_key text generated always as (right(student_id, 3)) stored,
+create table public.sai_lines (
+  sai_key    text primary key check (sai_key ~ '^[0-9]{3}$'),   -- เลข 3 ตัวท้ายของรหัส
+  junior_id  text,                                              -- รหัสน้อง (69) เต็ม ไว้อ้างอิง
+  c69 text,                                                     -- ช่องทางติดต่อ รหัส 69 (น้อง)
+  c68 text,                                                     -- รหัส 68 (พี่ปี 2)
+  c67 text,                                                     -- รหัส 67 (พี่ปี 3)
+  c66 text,                                                     -- รหัส 66 (พี่ปี 4)
   updated_at timestamptz not null default now()
 );
 
-create index if not exists sai_key_idx on public.sai_contacts (sai_key);
+-- RLS: anon อ่าน/เขียนตรงไม่ได้ (เข้าผ่าน API/service-role เท่านั้น) กันช่องทางติดต่อรั่ว
+alter table public.sai_lines enable row level security;
 
--- เปิด RLS — anon อ่าน/เขียนตรงไม่ได้เลย (เข้าผ่าน API/service-role เท่านั้น) กันช่องทางติดต่อรั่ว
-alter table public.sai_contacts enable row level security;
-
-drop policy if exists "staff read sai" on public.sai_contacts;
-create policy "staff read sai" on public.sai_contacts
+drop policy if exists "staff read sai" on public.sai_lines;
+create policy "staff read sai" on public.sai_lines
   for select using ( (auth.jwt() ->> 'staff') = 'true' );
