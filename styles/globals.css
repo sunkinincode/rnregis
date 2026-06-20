@@ -651,3 +651,29 @@ body:not([data-role="staff"]){
   .spark{ opacity:.7; }
   .loader{ border-top-color:var(--gem-gold); animation:none; }
 }
+
+/* ====== สายรหัส (หน้า /sai) ====== */
+.sai-wrap{ width:100%; max-width:540px; margin:0 auto; }
+.sai-card{ background:var(--bg); border:1px solid var(--line); border-radius:var(--r-xl);
+  padding:clamp(20px,4vw,28px); box-shadow:var(--shadow-lg); }
+.sai-hero{ text-align:center; margin-bottom:18px; }
+.sai-hero .sai-emoji{ font-size:2.4rem; line-height:1; }
+.sai-hero h1{ font-size:clamp(1.5rem,5vw,2rem); font-weight:700; letter-spacing:-.02em; margin-top:8px; color:var(--gem-ink); }
+.sai-hero p{ margin-top:8px; color:var(--gem-soft); font-size:.95rem; }
+.sai-form{ display:flex; flex-direction:column; gap:15px; }
+.sai-badge{ display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 14px;
+  border-radius:var(--r-full); font-size:.85rem; font-weight:700; margin-top:8px; }
+.sai-badge.junior{ background:var(--gem-gold); color:oklch(0.3 0.06 70); }
+.sai-badge.senior{ background:var(--primary); color:var(--primary-ink); }
+.sai-badge.bad{ background:var(--danger-weak); color:var(--danger); }
+.field textarea{ width:100%; min-height:84px; padding:12px 14px; border:1.5px solid var(--line-2);
+  border-radius:var(--r-sm); outline:none; font:inherit; font-size:.95rem; background:var(--surface);
+  resize:vertical; transition:.15s; }
+.field textarea:focus{ border-color:var(--primary); background:var(--bg); box-shadow:var(--shadow-glow); }
+.sai-consent{ display:flex; gap:10px; align-items:flex-start; font-size:.83rem; color:var(--ink-2); line-height:1.5; }
+.sai-consent input{ width:18px; height:18px; flex:none; margin-top:2px; accent-color:var(--primary); }
+.sai-done{ text-align:center; padding:14px 6px; }
+.sai-done .sai-done-ico{ width:62px; height:62px; margin:0 auto 14px; border-radius:50%; display:grid;
+  place-items:center; background:var(--ok); color:#fff; box-shadow:0 8px 24px oklch(0.6 0.13 152 / .4); }
+.sai-done h2{ font-size:1.3rem; font-weight:700; }
+.sai-done p{ color:var(--ink-2); margin-top:8px; font-size:.92rem; }

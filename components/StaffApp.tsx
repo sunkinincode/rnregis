@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import {
   Student, AttMap, AttRec, CHECKPOINTS, SLOTS, SlotId, houseHue, rowToRec,
 } from "@/lib/constants";
-import { staffLogin, staffLogout, staffToken, staffList, staffMark } from "@/lib/client";
+import { staffLogin, staffLogout, staffToken, staffList, staffMark, saiList } from "@/lib/client";
+import { SaiContact } from "@/lib/sai";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { fmtTs, isComplete, exportCsv } from "@/lib/format";
 import { useToasts, Toaster } from "./Toasts";
@@ -266,6 +267,7 @@ function Console({
   const [fltQ, setFltQ] = React.useState("");
   const [fltHouse, setFltHouse] = React.useState("");
   const [fltStatus, setFltStatus] = React.useState("");
+  const [tab, setTab] = React.useState<"att" | "sai">("att");
   const scanRef = React.useRef<HTMLInputElement>(null);
 
   const enriched = React.useMemo(
@@ -386,6 +388,15 @@ function Console({
       </header>
 
       <main className="staff-main">
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className={"btn " + (tab === "att" ? "btn-primary" : "btn-ghost")} onClick={() => setTab("att")}>เช็คชื่อ</button>
+          <button className={"btn " + (tab === "sai" ? "btn-primary" : "btn-ghost")} onClick={() => setTab("sai")}>สายรหัส</button>
+        </div>
+
+        {tab === "sai" ? (
+          <SaiView toast={toast} />
+        ) : (
+        <>
         <section>
           <div className="section-label">1 · เลือกช่วงที่กำลังเช็คชื่อ</div>
           <div className="checkpoints">
@@ -508,8 +519,126 @@ function Console({
             )}
           </div>
         </section>
+        </>
+        )}
       </main>
       <Toaster toasts={toasts} />
     </div>
+  );
+}
+
+/* ───────────────────────── สายรหัส (มุมเจ้าหน้าที่) ───────────────────────── */
+function SaiView({ toast }: { toast: (m: string, k?: "" | "ok" | "err") => void }) {
+  const [rows, setRows] = React.useState<SaiContact[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [err, setErr] = React.useState("");
+  const [q, setQ] = React.useState("");
+
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    setErr("");
+    try {
+      setRows(await saiList());
+    } catch {
+      setErr("โหลดข้อมูลไม่สำเร็จ");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  React.useEffect(() => {
+    load();
+  }, [load]);
+
+  const filtered = React.useMemo(() => {
+    const k = q.trim().toLowerCase();
+    if (!k) return rows;
+    return rows.filter((r) =>
+      (r.student_id + " " + r.name + " " + (r.nickname || "") + " " + r.contact).toLowerCase().includes(k),
+    );
+  }, [rows, q]);
+
+  const juniors = rows.filter((r) => r.role === "junior").length;
+  const seniors = rows.length - juniors;
+
+  const exportSaiCsv = () => {
+    const header = ["รหัสนักศึกษา", "บทบาท", "ชั้นปี", "ชื่อ-นามสกุล", "ชื่อเล่น", "ช่องทางติดต่อ", "ข้อความ", "อัปเดตเมื่อ"];
+    const body = rows.map((r) => [
+      r.student_id,
+      r.role === "junior" ? "น้องรหัส" : "พี่รหัส",
+      "ปี " + (69 - r.year + 1 > 0 ? 69 - r.year + 1 : ""),
+      r.name,
+      r.nickname || "",
+      r.contact,
+      r.message || "",
+      fmtTs(r.updated_at ? new Date(r.updated_at).getTime() : 0),
+    ]);
+    const csv = [header, ...body]
+      .map((row) => row.map((c) => { const v = c == null ? "" : String(c); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","))
+      .join("\r\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "สายรหัส_" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("ดาวน์โหลด CSV สายรหัสแล้ว (" + rows.length + " รายชื่อ)", "ok");
+  };
+
+  return (
+    <section className="tablewrap">
+      <div className="table-tools">
+        <label className="tfilter">
+          <IconSearch className="ico" />
+          <input type="search" placeholder="ค้นหา (รหัส/ชื่อ/ติดต่อ)" autoComplete="off" value={q} onChange={(e) => setQ(e.target.value)} />
+        </label>
+        <button className="btn btn-ghost" onClick={load}>รีเฟรช</button>
+        <button className="btn btn-ghost" onClick={exportSaiCsv} disabled={!rows.length}>
+          <IconDownload size={17} /> Export CSV
+        </button>
+      </div>
+      <div className="table-scroll">
+        <table className="att">
+          <thead>
+            <tr>
+              <th className="rownum">#</th>
+              <th>นักศึกษา</th>
+              <th className="c">บทบาท</th>
+              <th>ช่องทางติดต่อ</th>
+              <th className="hide-sm">ข้อความ</th>
+              <th className="c hide-sm">อัปเดต</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((r, i) => (
+              <tr key={r.student_id}>
+                <td className="rownum tnum">{i + 1}</td>
+                <td className="t-name">
+                  <b>{r.name}{r.nickname ? " (" + r.nickname + ")" : ""}</b>
+                  <span className="tnum">{r.student_id}</span>
+                </td>
+                <td className="c">
+                  <span className={"minichip " + (r.role === "junior" ? "miss" : "has")}>
+                    {r.role === "junior" ? "น้องรหัส" : "พี่รหัส"}
+                  </span>
+                </td>
+                <td style={{ wordBreak: "break-word" }}>{r.contact}</td>
+                <td className="hide-sm" style={{ color: "var(--ink-2)", fontSize: ".84rem" }}>{r.message || "—"}</td>
+                <td className="c hide-sm" style={{ color: "var(--ink-3)", fontSize: ".8rem", whiteSpace: "nowrap" }}>
+                  {r.updated_at ? fmtTs(new Date(r.updated_at).getTime()).slice(0, 16) : ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="table-foot">
+        {loading ? "กำลังโหลด…" : err ? <span style={{ color: "var(--danger)" }}>{err}</span> :
+          <>ทั้งหมด {rows.length} คน · น้องรหัส {juniors} · พี่รหัส {seniors}
+            {q && " · ตรงเงื่อนไข " + filtered.length}
+            {rows.length === 0 && <span className="table-empty">ยังไม่มีใครกรอกช่องทางติดต่อ</span>}
+          </>}
+      </div>
+    </section>
   );
 }

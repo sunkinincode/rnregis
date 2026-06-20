@@ -8,9 +8,6 @@ import {
   IconSearch, IconX, IconChevron, IconHouse, IconLock, IconAlert, IconLine, IconShield, IconCheck,
 } from "./icons";
 
-const SAI_LINK =
-  "https://docs.google.com/spreadsheets/d/1nYHoUtpsp9ETQmZwFQUMR1sC8VNcxzwzd-AEr6m5qhM/edit?usp=sharing";
-
 const TUT_KEY = "regis.tutorial";
 type Tut = { search?: 1; house?: 1; line?: 1; sai?: 1 };
 
@@ -239,20 +236,18 @@ export default function StudentApp() {
             <div className="checklist-done"><IconCheck /> ครบแล้ว! เจอบ้านและเข้ากลุ่มเรียบร้อย 🎉</div>
           </div>
 
-          <a
+          <Link
             className={"sairhad" + (tut.sai ? " done" : "")}
-            href={SAI_LINK}
-            target="_blank"
-            rel="noopener"
+            href="/sai"
             onClick={() => markTut("sai")}
           >
             <span className="sai-ico" aria-hidden="true">🧬</span>
             <span className="sai-body">
               <b>พร้อมเล่นสายรหัส?</b>
-              <span>ฝากชื่อ + ช่องทางติดต่อไว้ ให้รุ่นพี่สายรหัสมาตามหาน้องได้เลย</span>
+              <span>ฝากช่องทางติดต่อไว้ ให้พี่รหัส (ปี 68/67/66) กับน้องรหัสตามหากันเจอ</span>
             </span>
             <span className="sai-cta">กรอกข้อมูล&nbsp;→</span>
-          </a>
+          </Link>
         </section>
       </main>
 

@@ -1,5 +1,6 @@
 "use client";
 import { Student, AttMap, rowToRec, makeName } from "./constants";
+import { SaiContact } from "./sai";
 
 async function jget(url: string) {
   const r = await fetch(url, { cache: "no-store" });
@@ -62,4 +63,20 @@ export async function staffList(): Promise<{ students: Student[]; att: AttMap }>
 export async function staffMark(id: string, slot: string, val: boolean) {
   const j = await jpost("/api/staff/mark", { id, slot, val });
   return j.rec; // AttRec
+}
+
+// ── สายรหัส ──
+export async function saiSubmit(payload: {
+  studentId: string;
+  name: string;
+  nickname: string;
+  contact: string;
+  message: string;
+}): Promise<{ role: string; label: string }> {
+  const j = await jpost("/api/sai/submit", payload);
+  return { role: j.role, label: j.label };
+}
+export async function saiList(): Promise<SaiContact[]> {
+  const j = await jpost("/api/sai/list", {});
+  return (j.rows || []) as SaiContact[];
 }
