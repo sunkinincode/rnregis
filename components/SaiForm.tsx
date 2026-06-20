@@ -74,6 +74,13 @@ export default function SaiForm() {
 
       <main className="stu-main">
         <div className="sai-wrap">
+          {!done && (
+            <div className="sai-hero">
+              <div className="sai-emoji" aria-hidden="true">🧬</div>
+              <h1>ฝากช่องทางติดต่อ<span className="accent">สายรหัส</span></h1>
+              <p>กรอกได้ทั้ง <b>น้องรหัส (ปี 69)</b> และ <b>พี่รหัส (68/67/66)</b> เพื่อให้สายรหัสตามหากันเจอ</p>
+            </div>
+          )}
           <div className="sai-card">
             {done ? (
               <div className="sai-done">
@@ -88,13 +95,6 @@ export default function SaiForm() {
                 </Link>
               </div>
             ) : (
-              <>
-                <div className="sai-hero">
-                  <div className="sai-emoji" aria-hidden="true">🧬</div>
-                  <h1>ฝากช่องทางติดต่อสายรหัส</h1>
-                  <p>กรอกได้ทั้ง <b>น้องรหัส (ปี 69)</b> และ <b>พี่รหัส (ปี 68/67/66)</b> เพื่อให้สายรหัสตามหากันเจอ</p>
-                </div>
-
                 <form className="sai-form" autoComplete="off" onSubmit={submit}>
                   <div className="field">
                     <label>รหัสนักศึกษา</label>
@@ -150,7 +150,6 @@ export default function SaiForm() {
                     {busy ? "กำลังบันทึก…" : "บันทึกข้อมูล"}
                   </button>
                 </form>
-              </>
             )}
           </div>
         </div>

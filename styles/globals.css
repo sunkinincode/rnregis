@@ -656,10 +656,13 @@ body:not([data-role="staff"]){
 .sai-wrap{ width:100%; max-width:540px; margin:0 auto; }
 .sai-card{ background:var(--bg); border:1px solid var(--line); border-radius:var(--r-xl);
   padding:clamp(20px,4vw,28px); box-shadow:var(--shadow-lg); }
-.sai-hero{ text-align:center; margin-bottom:18px; }
-.sai-hero .sai-emoji{ font-size:2.4rem; line-height:1; }
-.sai-hero h1{ font-size:clamp(1.5rem,5vw,2rem); font-weight:700; letter-spacing:-.02em; margin-top:8px; color:var(--gem-ink); }
-.sai-hero p{ margin-top:8px; color:var(--gem-soft); font-size:.95rem; }
+.sai-hero{ text-align:center; margin-bottom:22px; }
+.sai-hero .sai-emoji{ font-size:2.6rem; line-height:1; filter:drop-shadow(0 6px 18px oklch(0.82 0.15 85 / .35)); }
+.sai-hero h1{ font-size:clamp(1.6rem,5.5vw,2.1rem); font-weight:700; letter-spacing:-.02em; margin-top:10px;
+  color:var(--gem-ink); text-shadow:0 2px 28px oklch(0.5 0.12 250 / .5); text-wrap:balance; }
+.sai-hero h1 .accent{ color:var(--gem-gold); }
+.sai-hero p{ margin-top:10px; color:var(--gem-soft); font-size:.95rem; text-wrap:balance; }
+.sai-hero p b{ color:var(--gem-ink); font-weight:600; }
 .sai-form{ display:flex; flex-direction:column; gap:15px; }
 .sai-badge{ display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 14px;
   border-radius:var(--r-full); font-size:.85rem; font-weight:700; margin-top:8px; }
