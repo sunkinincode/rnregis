@@ -17,6 +17,9 @@ _embed.json
 # ── ของเก่า (Apps Script ฯลฯ) เก็บไว้ในเครื่อง ไม่ขึ้น GitHub ──
 legacy/apps-script/
 
+# ── คู่มือ deploy/setup (เก็บในเครื่อง ไม่ต้องขึ้น GitHub) ──
+DEPLOY.md
+
 # ── Next.js / build artifacts ──
 node_modules/
 .next/
