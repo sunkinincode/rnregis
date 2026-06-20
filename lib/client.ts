@@ -80,3 +80,7 @@ export async function saiList(): Promise<SaiContact[]> {
   const j = await jpost("/api/sai/list", {});
   return (j.rows || []) as SaiContact[];
 }
+export async function saiLookup(studentId: string): Promise<{ saiKey: string; rows: SaiContact[] }> {
+  const j = await jpost("/api/sai/lookup", { studentId });
+  return { saiKey: j.saiKey, rows: (j.rows || []) as SaiContact[] };
+}

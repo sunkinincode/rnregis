@@ -4,7 +4,8 @@ import { saiInfo } from "@/lib/sai";
 
 export const dynamic = "force-dynamic";
 
-// บันทึกช่องทางติดต่อสายรหัส (สาธารณะ) — ใครก็กรอกได้ แต่ตรวจรูปแบบรหัสก่อน
+// บันทึกช่องทางติดต่อสายรหัส (สาธารณะ) — บังคับแค่รหัส + ช่องทางติดต่อ
+// (year/role/sai_key คำนวณในฐานข้อมูลอัตโนมัติ)
 export async function POST(req: NextRequest) {
   let body: any = {};
   try {
@@ -20,12 +21,8 @@ export async function POST(req: NextRequest) {
   const message = String(body?.message || "").trim();
 
   const info = saiInfo(studentId);
-  if (!info.role) {
-    return NextResponse.json({ ok: false, error: "bad-id" }, { status: 400 });
-  }
-  if (!name || !contact) {
-    return NextResponse.json({ ok: false, error: "missing-fields" }, { status: 400 });
-  }
+  if (!info.role) return NextResponse.json({ ok: false, error: "bad-id" }, { status: 400 });
+  if (!contact) return NextResponse.json({ ok: false, error: "missing-contact" }, { status: 400 });
   if (name.length > 120 || contact.length > 200 || nickname.length > 60 || message.length > 500) {
     return NextResponse.json({ ok: false, error: "too-long" }, { status: 400 });
   }
@@ -43,11 +40,9 @@ export async function POST(req: NextRequest) {
     const { error } = await supa.from("sai_contacts").upsert(
       {
         student_id: studentId,
-        year: info.year,
-        role: info.role,
-        name,
-        nickname: nickname || null,
         contact,
+        name: name || null,
+        nickname: nickname || null,
         message: message || null,
         updated_at: new Date().toISOString(),
       },

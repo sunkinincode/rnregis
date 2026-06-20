@@ -27,6 +27,11 @@ export function saiInfo(studentId: string): SaiInfo {
   }
 }
 
+// กุญแจสายรหัส = เลข 3 ตัวท้ายของรหัส (คนสายเดียวกันตรงกัน)
+export function saiKey(studentId: string): string {
+  return (studentId || "").trim().slice(-3);
+}
+
 export type SaiContact = {
   student_id: string;
   year: number;

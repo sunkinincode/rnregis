@@ -680,3 +680,26 @@ body:not([data-role="staff"]){
   place-items:center; background:var(--ok); color:#fff; box-shadow:0 8px 24px oklch(0.6 0.13 152 / .4); }
 .sai-done h2{ font-size:1.3rem; font-weight:700; }
 .sai-done p{ color:var(--ink-2); margin-top:8px; font-size:.92rem; }
+
+/* แท็บ + ผลค้นหาสายรหัส */
+.sai-tabs{ display:flex; gap:8px; margin-bottom:14px; }
+.sai-tab{ flex:1; height:44px; border-radius:var(--r-md); font-weight:600; font-size:.95rem;
+  background:oklch(0.55 0.07 252 / .28); color:var(--gem-soft); border:1px solid oklch(0.82 0.08 245 / .22);
+  backdrop-filter:blur(8px); transition:transform .12s var(--ease), background .15s, color .15s, border-color .15s; }
+.sai-tab:hover{ color:var(--gem-ink); }
+.sai-tab.active{ background:var(--gem-gold); color:oklch(0.3 0.06 70); border-color:var(--gem-gold);
+  box-shadow:0 6px 18px oklch(0.82 0.15 85 / .35); }
+.sai-tab:active{ transform:translateY(1px) scale(.99); }
+.sai-note{ font-size:.86rem; color:var(--ink-2); line-height:1.55; }
+.sai-note.warn{ background:var(--warn-weak); border:1px solid oklch(0.82 0.1 70); border-radius:var(--r-md);
+  padding:12px 14px; color:oklch(0.45 0.1 64); }
+.sai-reslist{ display:flex; flex-direction:column; gap:10px; }
+.sai-resitem{ border:1px solid var(--line); border-radius:var(--r-md); padding:13px 15px; background:var(--surface);
+  animation:rowIn .35s var(--ease) both; }
+.sai-resitem .res-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.sai-resitem .res-nm{ font-weight:600; }
+.sai-resitem .res-id{ font-size:.8rem; color:var(--ink-3); }
+.sai-resitem .res-contact{ margin-top:8px; font-weight:600; color:var(--primary-deep); word-break:break-word; display:flex; align-items:center; gap:7px; }
+.sai-resitem .res-msg{ margin-top:5px; font-size:.86rem; color:var(--ink-2); line-height:1.5; }
+.sai-keychip{ display:inline-block; font-weight:700; background:var(--surface-2); color:var(--ink);
+  padding:2px 10px; border-radius:var(--r-full); font-variant-numeric:tabular-nums; }

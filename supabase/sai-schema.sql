@@ -1,20 +1,31 @@
 -- ============================================================
 --  สายรหัส — ตารางเก็บช่องทางติดต่อ (แทน Google Sheet)
---  วางใน Supabase → SQL Editor → Run (ครั้งเดียว)
+--  วางใน Supabase → SQL Editor → Run
+--
+--  ⚠️ ถ้าเคยรันเวอร์ชันก่อนหน้าแล้ว ไฟล์นี้จะ DROP ตารางเดิมทิ้งก่อน
+--     (ตารางนี้ยังไม่มีข้อมูลจริง — ถ้ามีข้อมูลแล้วให้สำรองก่อน)
 -- ============================================================
 
-create table if not exists public.sai_contacts (
-  student_id text primary key,
-  year       int  not null,                 -- 69 = น้องรหัส, 68/67/66 = พี่รหัส
-  role       text not null,                  -- 'junior' | 'senior'
-  name       text not null,                  -- ชื่อ-นามสกุล
-  nickname   text,                           -- ชื่อเล่น
-  contact    text not null,                  -- ช่องทางติดต่อ (Line/IG/เบอร์)
-  message    text,                           -- ข้อความถึงรุ่นพี่/รุ่นน้อง (ไม่บังคับ)
+drop table if exists public.sai_contacts cascade;
+
+create table public.sai_contacts (
+  student_id text primary key
+    check (student_id ~ '^[0-9]{10}$' and left(student_id, 2) in ('66','67','68','69')),
+  contact    text not null,                  -- ช่องทางติดต่อ (บังคับ)
+  name       text,                           -- ชื่อ-นามสกุล (ไม่บังคับ)
+  nickname   text,                           -- ชื่อเล่น (ไม่บังคับ)
+  message    text,                           -- ข้อความ (ไม่บังคับ)
+  -- ปี/บทบาท คำนวณจากเลขขึ้นต้นรหัสอัตโนมัติ → ตอน import ใส่แค่ student_id + contact ก็พอ
+  year int  generated always as (left(student_id, 2)::int) stored,
+  role text generated always as (case when left(student_id, 2) = '69' then 'junior' else 'senior' end) stored,
+  -- เลข 3 ตัวท้าย = กุญแจสายรหัส (คนสายเดียวกันตรงกัน)
+  sai_key text generated always as (right(student_id, 3)) stored,
   updated_at timestamptz not null default now()
 );
 
--- เปิด RLS — anon อ่าน/เขียนตรงไม่ได้เลย (เข้าผ่าน API/service-role เท่านั้น) กันข้อมูลติดต่อรั่ว
+create index if not exists sai_key_idx on public.sai_contacts (sai_key);
+
+-- เปิด RLS — anon อ่าน/เขียนตรงไม่ได้เลย (เข้าผ่าน API/service-role เท่านั้น) กันช่องทางติดต่อรั่ว
 alter table public.sai_contacts enable row level security;
 
 drop policy if exists "staff read sai" on public.sai_contacts;
