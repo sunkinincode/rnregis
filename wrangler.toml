@@ -1,0 +1,8 @@
+name = "rnregis"
+compatibility_date = "2024-10-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+# หมายเหตุ: ตัวแปรลับ (SUPABASE_SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET, STAFF_HASH ฯลฯ)
+# ห้ามใส่ในไฟล์นี้ — ตั้งใน Cloudflare Pages → Settings → Environment variables (เข้ารหัส)
+# ตอน dev ในเครื่อง ใส่ใน .dev.vars (สำหรับ wrangler) หรือ .env.local (สำหรับ next dev)

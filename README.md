@@ -1,117 +1,134 @@
 # ระบบกิจกรรมรับน้อง — ค้นหาบ้าน & เช็คชื่อ
 
-เว็บไฟล์เดียว **`index.html`** มี 2 บทบาทในไฟล์เดียว และ **สองบทบาทไม่เห็นกัน**
+เว็บแอป **Next.js + Supabase** deploy บน **Cloudflare Pages** มี 2 บทบาทแยกกัน
 
 | บทบาท | ใครใช้ | เข้าอย่างไร |
 |---|---|---|
-| 🔍 ค้นหาบ้าน | นักศึกษาทั่วไป | เปิดหน้าแรก (ผ่านหน้า **ยินยอม PDPA** ก่อน) |
-| ✅ หน่วยลงทะเบียน | เจ้าหน้าที่ | กดลิงก์ “เจ้าหน้าที่” มุมขวาบน → ใส่ **รหัสผ่าน** |
+| 🔍 ค้นหาบ้าน | นักศึกษาทั่วไป | หน้าแรก `/` (ผ่านหน้า **ยินยอม PDPA** ก่อน) |
+| ✅ หน่วยลงทะเบียน | เจ้าหน้าที่ | หน้า `/staff` → ใส่ **รหัสผ่าน** |
 
-> ☝️ **สำคัญเรื่องความเป็นส่วนตัว (PDPA) + ความปลอดภัย:** รายชื่อ + รหัสนักศึกษา **ไม่ได้ฝังใน `index.html`** และไม่อยู่ใน GitHub — เก็บแยกใน **Google Sheet**
->
-> - **หน้านักศึกษา** ค้นทีละคนผ่านเซิร์ฟเวอร์ (พิมพ์รหัส/ชื่อ → คืนเฉพาะบ้านของคนนั้น) — **ไม่ดาวน์โหลดรายชื่อทั้งหมดมาที่เบราว์เซอร์** จึงดึงทั้งฐานข้อมูลออกไปไม่ได้
-> - **หน้าเจ้าหน้าที่** (รายชื่อทั้งหมด + เช็คชื่อ) **เซิร์ฟเวอร์บังคับรหัสผ่านทุกคำขอ** — ไม่มีรหัส = ไม่ได้ข้อมูล (ไม่ใช่แค่ซ่อน div ฝั่งเบราว์เซอร์)
-
----
-
-## 🔑 รหัสผ่านเจ้าหน้าที่
-
-> 🔒 **รหัสผ่านไม่อยู่ในโค้ดหรือ GitHub** และ **เซิร์ฟเวอร์ (Apps Script) เป็นผู้ตรวจ** — ฝั่งเบราว์เซอร์มีแค่ค่าแฮชไว้เช็คเบื้องต้นให้เด้งเร็ว แต่ด่านจริงอยู่ที่เซิร์ฟเวอร์
-
-- รหัสจริงเก็บเป็น **แฮช SHA‑256** ใน Apps Script → **Project Settings → Script properties** คีย์ `STAFF_HASH` (ดูขั้นตอนตั้งค่า)
-- ทุกคำขอรายชื่อ/เช็คชื่อ ต้องแนบรหัส เซิร์ฟเวอร์เทียบแฮชก่อนคืนข้อมูล — รหัสผิด = `unauthorized` ไม่มีข้อมูลหลุด
-- เป็นรหัสแบบ **ตัวอักษรคละตัวเลข แยกพิมพ์เล็ก/ใหญ่** · ตั้ง/เปลี่ยนได้ตามหัวข้อ “สร้างไฟล์ใหม่” ด้านล่าง
+> 🔒 **ความเป็นส่วนตัว (PDPA) + ความปลอดภัย**
+> - รายชื่อ + รหัสนักศึกษาเก็บใน **Supabase (Postgres)** เท่านั้น — ไม่อยู่ใน GitHub และไม่ฝังในหน้าเว็บ
+> - **หน้านักศึกษา** ค้นทีละคนผ่าน API ของเซิร์ฟเวอร์ (คืนเฉพาะคนที่ตรง สูงสุด 8 รายการ) — เบราว์เซอร์ไม่เคยดึงรายชื่อทั้งก้อน
+> - **หน้าเจ้าหน้าที่** เซิร์ฟเวอร์บังคับรหัสผ่านทุกคำขอ + ทุกตารางเปิด **RLS** (กุญแจ anon อ่านตรงไม่ได้)
+> - เช็คชื่อ **ซิงก์เรียลไทม์** ข้ามเครื่องผ่าน **Supabase Realtime** (ไม่ใช่ poll หน่วงๆ แบบเดิม)
 
 ---
 
-## ⚙️ ตั้งค่าให้ใช้งานได้จริง (ทำครั้งเดียว ~10 นาที)
+## 🧱 สถาปัตยกรรมโดยย่อ
 
-เว็บต้องต่อกับ **Google Sheet (ฐานข้อมูล)** ผ่าน **Google Apps Script** — *ไม่มีรหัสฐานข้อมูลในไฟล์ HTML* มีแค่ลิงก์เว็บแอป (ไม่ใช่รหัสลับ)
+```
+เบราว์เซอร์ (Next.js / React)
+   ├─ หน้านักศึกษา  → GET /api/find         → (service role) Supabase
+   └─ หน้าเจ้าหน้าที่ → POST /api/staff/login  → ออก session cookie + Realtime token
+                      GET  /api/staff/list   → รายชื่อ + การเช็คชื่อ
+                      POST /api/staff/mark    → เช็คชื่อ (เซิร์ฟเวอร์ลง timestamp)
+                      Supabase Realtime (websocket) ← อัปเดตทันทีทุกเครื่อง
+```
 
-### 1) สร้างฐานข้อมูล + นำเข้ารายชื่อ
-1. สร้าง **Google Sheet** ใหม่ 1 ไฟล์
-2. เมนู **File → Import → Upload** เลือกไฟล์ **`roster-import.csv`** (อยู่ในเครื่อง ไม่ได้ขึ้น GitHub)
-   - เลือก **Insert new sheet(s)** → เปลี่ยนชื่อแท็บที่ได้เป็น **`students`**
-   - หัวคอลัมน์ต้องเป็น: `id, prefix, first, last, house, program`
+- **Auth:** รหัสร่วมตัวเดียว เซิร์ฟเวอร์เทียบกับ `STAFF_HASH` (sha256) → ออก JWT (เซ็นด้วย `SUPABASE_JWT_SECRET`) เก็บใน cookie httpOnly และให้ browser ใช้ต่อ Realtime
+- **RLS:** ตาราง `students` / `attendance` / `houses` อ่าน/เขียนได้เฉพาะ token ที่มี claim `staff=true`; API routes ใช้ service-role key (bypass RLS)
 
-### 2) ติดตั้ง Backend + ตั้งรหัสผ่านฝั่งเซิร์ฟเวอร์
-3. เมนู **Extensions → Apps Script** → ลบของเดิม วางเนื้อหา **`apps-script/Code.gs`** (ไฟล์นี้อยู่ในเครื่อง **ไม่ขึ้น GitHub**) → บันทึก 💾
-4. **ตั้งรหัสผ่านเจ้าหน้าที่ (สำคัญ — ถ้าไม่ตั้ง หน้าเจ้าหน้าที่จะไม่ได้ข้อมูลเลย)** เลือกวิธีใดวิธีหนึ่ง:
-   - **ง่ายสุด:** เปิดฟังก์ชัน `setStaffPassword()` ใน Code.gs → ใส่รหัสจริงแทน `'...'` → กด **Run** → **ลบรหัสออกทันที**
-   - หรือ **Project Settings (⚙️) → Script properties → Add** คีย์ `STAFF_HASH` ค่า = แฮชที่ `build.mjs` พิมพ์ออกมา
-5. **Deploy → New deployment → Web app**
-   - Execute as: **Me** · Who has access: **Anyone** ← สำคัญ (การตรวจสิทธิ์ทำในโค้ดด้วยรหัสผ่าน ไม่ใช่ที่ระดับนี้)
-6. คัดลอกลิงก์ที่ลงท้าย **`/exec`**
+---
 
-> 🔁 **แก้ไขทีหลัง:** ทุกครั้งที่แก้ Code.gs ต้อง **Deploy → Manage deployments → ✏️ → New version** ลิงก์ `/exec` เดิมถึงจะอัปเดต
+## ⚙️ ติดตั้งครั้งแรก (~15 นาที)
 
-### 3) เชื่อมเว็บกับ Backend
-7. **หน้านักศึกษา:** build ฝังลิงก์ (หน้านักศึกษาไม่มีหน้าตั้งค่า):
+### 1) สร้างโปรเจกต์ Supabase + ตาราง
+1. สร้างโปรเจกต์ใหม่ที่ [supabase.com](https://supabase.com)
+2. เมนู **SQL Editor** → วางเนื้อหา **`supabase/schema.sql`** ทั้งหมด → **Run**
+   (สร้างตาราง + RLS + เปิด Realtime + seed ลิงก์กลุ่มไลน์ 12 บ้าน)
+3. เมนู **Project Settings → API** จดค่า: `Project URL`, `anon public key`, `service_role key`
+4. เมนู **Project Settings → API → JWT Settings** จดค่า **JWT Secret**
+
+### 2) ตั้งรหัสผ่านเจ้าหน้าที่ (STAFF_HASH)
+รหัสผ่าน **ไม่อยู่ในโค้ด** — เก็บเป็นแฮช sha256 ใน env ชื่อ `STAFF_HASH`
+สร้างแฮชจากรหัสที่ต้องการ:
+```bash
+node -e "crypto.subtle.digest('SHA-256',new TextEncoder().encode(process.argv[1])).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))" 'รหัสผ่านที่ตั้งเอง'
+```
+นำค่าที่ได้ไปใส่เป็น `STAFF_HASH`
+
+### 3) นำเข้ารายชื่อนักศึกษา
+1. คัดลอก `.env.local.example` เป็น **`.env.local`** แล้วเติมค่าจริง (ดูตัวแปรด้านล่าง)
+2. รัน:
    ```bash
-   STAFF_PIN="<รหัสผ่านเจ้าหน้าที่>" BACKEND_URL="https://script.google.com/macros/s/XXXX/exec" node build.mjs
+   npm install
+   npm run seed      # อ่าน roster-import.csv → ตาราง students (ทำในเครื่อง ไม่ขึ้น GitHub)
    ```
-   แล้ว push `index.html` ขึ้น GitHub อีกครั้ง (ดูหัวข้อ Deploy)
-8. **หน้าเจ้าหน้าที่:** เปิดเว็บ → `#staff` → ใส่รหัสผ่าน (ตัวเดียวกับ `STAFF_PIN`/`STAFF_HASH`)
 
-> ⚠️ รหัสผ่านที่ใส่ตอน build (`STAFF_PIN`) กับที่ตั้งในเซิร์ฟเวอร์ (`STAFF_HASH`) **ต้องเป็นรหัสเดียวกัน** — `build.mjs` จะพิมพ์ค่า `STAFF_HASH` ที่ตรงกันให้คัดลอกไปวางได้เลย
+### 4) รันในเครื่อง
+```bash
+npm run dev          # http://localhost:3000  (หน้าเจ้าหน้าที่: /staff)
+```
+
+---
+
+## 🔐 ตัวแปรสภาพแวดล้อม (env)
+
+| ตัวแปร | ลับ? | ใช้ทำอะไร |
+|---|---|---|
+| `SUPABASE_URL` | – | URL โปรเจกต์ Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | **ลับมาก** | ฝั่งเซิร์ฟเวอร์ bypass RLS |
+| `SUPABASE_JWT_SECRET` | **ลับ** | เซ็น token (session + Realtime) |
+| `STAFF_HASH` | **ลับ** | sha256 ของรหัสผ่านเจ้าหน้าที่ |
+| `NEXT_PUBLIC_SUPABASE_URL` | – | ฝั่ง browser (Realtime) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | – | ฝั่ง browser (ถูกล็อกด้วย RLS) |
+
+> ⚠️ ห้าม commit `.env.local` หรือค่าจริงใดๆ ขึ้น GitHub (อยู่ใน `.gitignore` แล้ว)
+
+---
+
+## 🚀 Deploy ขึ้น Cloudflare Pages
+
+1. push โค้ดขึ้น GitHub (ข้อมูล PII และ env ไม่ขึ้นไปด้วย — ดู `.gitignore`)
+2. Cloudflare Dashboard → **Workers & Pages → Create → Pages → เชื่อม GitHub repo**
+3. ตั้งค่า build:
+   - **Build command:** `npx @cloudflare/next-on-pages`
+   - **Build output directory:** `.vercel/output/static`
+   - **Compatibility flags:** เพิ่ม `nodejs_compat` (ทั้ง Production และ Preview)
+4. **Settings → Environment variables** ใส่ตัวแปรทั้งหมดจากตารางด้านบน (เป็น Encrypted สำหรับค่าที่ลับ)
+5. Deploy — หน้าเว็บ: `https://<project>.pages.dev` · หน้าเจ้าหน้าที่: ต่อท้าย `/staff`
+
+> สร้าง production build ในเครื่องเพื่อทดสอบก่อนได้: `npm run pages:build`
+
+---
+
+## 🗂 โครงสร้างไฟล์
+
+```
+app/                    หน้าเว็บ + API routes (edge runtime)
+  page.tsx              หน้านักศึกษา        staff/page.tsx  หน้าเจ้าหน้าที่
+  api/find/             ค้นหาสาธารณะ
+  api/staff/            login · logout · token · list · mark
+components/             StudentApp, StaffApp, icons, Toasts
+lib/                    auth, supabase-server/browser, find, format, constants, client
+styles/globals.css     ดีไซน์ (พอร์ตจากเว็บเดิมทั้งหมด)
+supabase/
+  schema.sql            ตาราง + RLS + seed บ้าน
+  seed-students.mjs     นำเข้ารายชื่อ (รันในเครื่อง)
+
+── ไม่ขึ้น GitHub (.gitignore) ──
+.env.local              ความลับทั้งหมด
+roster-import.csv       รายชื่อ (PII)
+_embed.json · *.pdf · คิวอาร์โค้ดแต่ละบ้าน/   ไฟล์ต้นฉบับ (PII)
+legacy/                 เว็บเวอร์ชันเก่า (HTML ไฟล์เดียว + Apps Script) เก็บไว้อ้างอิง
+```
 
 ---
 
 ## การใช้งาน
 
 ### นักศึกษา
-- เข้าเว็บ → กด **ยอมรับ PDPA** → พิมพ์ **รหัส** หรือ **ชื่อ-นามสกุล** → เจอบ้าน + กลุ่มไลน์ (ปุ่ม + QR)
-- มี **เช็คลิสต์ to-do** (ค้นหา → ดูบ้าน → เข้าไลน์) ติ๊กถูกอัตโนมัติ
-- มี **การ์ดสายรหัส** ลิงก์ฟอร์มให้ฝากช่องทางติดต่อ — แก้ลิงก์ได้ที่ `id="saiLink"` ใน `src/app.template.html`
+เข้าเว็บ → ยอมรับ PDPA → พิมพ์ **รหัส** หรือ **ชื่อ-นามสกุล** → เจอบ้าน + กลุ่มไลน์ (ปุ่ม + QR) · มีเช็คลิสต์ 3 ขั้น และการ์ดสายรหัส
 
 ### เจ้าหน้าที่ (เช็คชื่อ 3 ช่วง)
-1. กด “เจ้าหน้าที่” → ใส่รหัสผ่าน
+1. `/staff` → ใส่รหัสผ่าน
 2. เลือกช่วง (20 มิ.ย. / 21 มิ.ย. / ออกงาน)
-3. **สแกนบาร์โค้ด** หรือพิมพ์รหัสแล้ว Enter → เช็คชื่อทันที
-4. ครบ 3 ช่วง = ได้ชั่วโมงกิจกรรม · แก้รายคนในตารางได้ · **Export CSV** ได้ (Excel ไทยไม่เพี้ยน)
-   - บันทึก **เวลา (timestamp) ของแต่ละช่วง** ที่กดเช็คของแต่ละคน — เห็นได้เมื่อเอาเมาส์ชี้ที่เครื่องหมายถูก และมีคอลัมน์ “เวลาเช็ค” ในไฟล์ CSV
-5. หลายเครื่องเห็นข้อมูลตรงกันแบบเรียลไทม์ (ซิงก์ทุก 5 วิ ผ่าน Sheet เดียวกัน)
+3. **สแกนบาร์โค้ด** หรือพิมพ์รหัสแล้ว Enter → เช็คทันที (บันทึกเวลาให้)
+4. ครบ 3 ช่วง = ได้ชั่วโมงกิจกรรม · แก้รายคนในตารางได้ · **Export CSV** (Excel ไทยไม่เพี้ยน)
+5. ทุกเครื่องเห็นข้อมูลตรงกัน **เรียลไทม์** ผ่าน Supabase Realtime
 
 ---
 
-## 🚀 Deploy ขึ้น GitHub Pages
-
-repo นี้ตั้งค่า **noindex / robots.txt** กัน Google index และ **ไม่ commit ข้อมูล PII** (PDF, QR ดิบ, รายชื่อ)
-
-```bash
-git add -A
-git commit -m "update"
-git push
-```
-หน้าเว็บ: `https://<user>.github.io/rnregis/` · หน้าเจ้าหน้าที่: ต่อท้าย `#staff`
-
----
-
-## สร้างไฟล์ใหม่ / เปลี่ยนรหัสผ่าน
-
-```bash
-node build.mjs                                   # placeholder (ต้องกำหนดรหัสผ่านเอง)
-STAFF_PIN="<ตั้งรหัสผ่านเอง>" BACKEND_URL="https://…/exec" node build.mjs   # กำหนดรหัสผ่าน + backend
-```
-
-### โครงสร้างไฟล์
-```
-index.html              ← ไฟล์ใช้งานจริง (ไม่มี PII) — แจก/host อันนี้
-README.md               ← คู่มือนี้
-src/app.template.html   ← ซอร์สหน้าเว็บ (แก้ดีไซน์/ข้อความที่นี่)
-build.mjs               ← สคริปต์ประกอบไฟล์
-_qr.json                ← ลิงก์กลุ่มไลน์ 12 บ้าน (ไม่ใช่ PII)
-package/                ← ไลบรารีสร้าง QR
-
-── ไม่ขึ้น GitHub (.gitignore) ──
-apps-script/Code.gs     ← Backend (วางใน Google Apps Script เอง — ผู้จัดตั้งค่าเอง)
-roster-import.csv       ← รายชื่อสำหรับ import เข้า Google Sheet (PII)
-_embed.json             ← ข้อมูลรวมที่ถอดจาก PDF (PII)
-รายชื่อบ้าน1-12.pdf · คิวอาร์โค้ดแต่ละบ้าน/   ← ไฟล์ต้นฉบับ (PII)
-```
-
----
-
-## หมายเหตุ
-- ชื่อ-นามสกุลถอดจาก PDF และแก้สระ/วรรณยุกต์ที่เข้ารหัสพิเศษกลับมาครบถ้วน (เช่น “พิชญุตม์ จิโรจน์กุล”)
-- หน้านักศึกษาต้องต่อเน็ตครั้งแรกเพื่อโหลดรายชื่อ (หลังจากนั้นแคชในเครื่อง ใช้ต่อได้แม้เน็ตสะดุด)
+## เปลี่ยนรหัสผ่านภายหลัง
+สร้างแฮชใหม่ (ดูขั้นตอนที่ 2) แล้วแก้ค่า `STAFF_HASH` ใน Cloudflare → Redeploy · ควรเปลี่ยนรหัสหลังจบกิจกรรม

@@ -1,21 +1,28 @@
-# ข้อมูลดิบ (PII) — ไม่ commit ขึ้น GitHub
+# ── ข้อมูลดิบ (PII) — ห้าม commit ขึ้น GitHub ──
 รายชื่อบ้าน1-12.pdf
 คิวอาร์โค้ดแต่ละบ้าน/
 roster-import.csv
+attendance-export.csv
+supabase/seed-attendance.sql
+supabase/seed-students.sql
 _embed.json
 
-# ไฟล์ที่ผู้จัดตั้งค่า/วางเองในบริการอื่น (เช่น วางใน Google Apps Script) — ไม่ขึ้น GitHub
-apps-script/
+# ── ความลับ / env ──
+.env
+.env.local
+.env*.local
+.dev.vars
+.dev.vars.*
 
-# build / dev artifacts
+# ── ของเก่า (Apps Script ฯลฯ) เก็บไว้ในเครื่อง ไม่ขึ้น GitHub ──
+legacy/apps-script/
+
+# ── Next.js / build artifacts ──
 node_modules/
-_shots/
-_*.txt
+.next/
+out/
+.vercel/
+.wrangler/
 *.tgz
-
-# QR lib: keep only the file build.mjs needs
-package/*
-!package/dist/
-package/dist/*
-!package/dist/qrcode.js
-!package/package.json
+next-env.d.ts
+.DS_Store
