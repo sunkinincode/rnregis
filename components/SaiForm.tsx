@@ -174,8 +174,10 @@ function LookupPanel() {
   return (
     <div className="sai-form">
       <div className="field">
-        <label>รหัสนักศึกษาของคุณ</label>
-        <div className="desc" style={{ margin: "0 0 8px" }}>ใส่รหัสตัวเอง เพื่อดูช่องทางติดต่อพี่/น้องในสายเดียวกัน (เลข 3 ตัวท้ายตรงกัน)</div>
+        <label>รหัสนักศึกษาของ<b>ตัวคุณเอง</b></label>
+        <div className="desc" style={{ margin: "0 0 8px" }}>
+          ใส่รหัส<b>ของคุณ</b> (ไม่ใช่รหัสคนที่อยากหา) → ระบบจะแสดงช่องทางติดต่อของทุกคนใน<b>สายเดียวกัน</b> คือรหัสลงท้าย 3 ตัวเหมือนกัน
+        </div>
         <form onSubmit={run} style={{ display: "flex", gap: 8 }}>
           <input type="text" inputMode="numeric" placeholder="เช่น 6910210001" value={id}
             onChange={(e) => { setId(e.target.value.replace(/[^0-9]/g, "")); setState("idle"); }} maxLength={10} style={{ flex: 1 }} />
@@ -183,6 +185,14 @@ function LookupPanel() {
             <IconSearch size={18} /> {busy ? "…" : "ค้นหา"}
           </button>
         </form>
+        {id.trim().length > 0 && (info.role ? (
+          <div className="desc" style={{ marginTop: 8, color: "var(--ink-2)" }}>
+            คุณคือ <b>{info.label}</b> — กดค้นหาเพื่อดู{info.role === "junior" ? "ช่องทางติดต่อของ" : ""}
+            <b>{info.role === "junior" ? "พี่รหัส" : "น้องรหัส และพี่คนอื่น"}</b>ในสายของคุณ
+          </div>
+        ) : (
+          <span className="sai-badge bad">รหัสต้องขึ้นต้น 66–69 และมี 10 หลัก</span>
+        ))}
       </div>
 
       {state === "bad" && <div className="sai-note warn">รหัสไม่ถูกต้อง — ต้องขึ้นต้น 66–69 และมี 10 หลัก</div>}
@@ -192,7 +202,7 @@ function LookupPanel() {
           <div className="sai-note">ยังไม่มีใครในสายของคุณ (เลขท้าย <span className="sai-keychip">{saiKey}</span>) กรอกช่องทางติดต่อ — ลองชวนกันมากรอก แล้วกลับมาดูใหม่นะ</div>
         ) : (
           <>
-            <div className="sai-note">สายรหัสเลขท้าย <span className="sai-keychip">{saiKey}</span></div>
+            <div className="sai-note">สายรหัสของคุณ (รหัสลงท้าย <span className="sai-keychip">{saiKey}</span>) — ช่องทางติดต่อทั้งสาย:</div>
             <div className="sai-reslist">
               {SAI_YEARS.map((y) => {
                 const c = (line as any)[y.col] as string | null;
