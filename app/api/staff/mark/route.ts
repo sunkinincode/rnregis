@@ -3,7 +3,6 @@ import { verifySession, SESSION_COOKIE } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase-server";
 import { SLOTS, SLOT_COL, SLOT_AT_COL, SlotId, rowToRec } from "@/lib/constants";
 
-export const runtime = "edge";
 
 // เช็ค/ยกเลิกการเช็คชื่อ 1 ช่วง — timestamp ถูกใส่ที่เซิร์ฟเวอร์ (เชื่อถือได้)
 export async function POST(req: NextRequest) {

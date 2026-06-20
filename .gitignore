@@ -22,6 +22,7 @@ node_modules/
 .next/
 out/
 .vercel/
+.open-next/
 .wrangler/
 *.tgz
 next-env.d.ts

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkPassword, signSession, signRealtimeToken, SESSION_COOKIE } from "@/lib/auth";
 
-export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
   let password = "";

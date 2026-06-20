@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifySession, SESSION_COOKIE } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase-server";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 // รายชื่อทั้งหมด + การเช็คชื่อทั้งหมด (ต้องล็อกอินเจ้าหน้าที่)
-export async function GET(req: NextRequest) {
+// ใช้ POST เพราะ next-on-pages มีบั๊กกับ GET route handler
+export async function POST(req: NextRequest) {
   const ok = await verifySession(req.cookies.get(SESSION_COOKIE)?.value);
   if (!ok) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
 

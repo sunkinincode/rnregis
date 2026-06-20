@@ -22,7 +22,7 @@ async function jpost(url: string, body: any) {
 
 // ── สาธารณะ (นักศึกษา) ──
 export async function apiFind(q: string): Promise<Student[]> {
-  const j = await jget("/api/find?q=" + encodeURIComponent(q) + "&t=" + Date.now());
+  const j = await jpost("/api/find", { q });
   return (j.rows || []) as Student[];
 }
 
@@ -35,11 +35,11 @@ export async function staffLogout(): Promise<void> {
   await fetch("/api/staff/logout", { method: "POST" });
 }
 export async function staffToken(): Promise<string> {
-  const j = await jget("/api/staff/token");
+  const j = await jpost("/api/staff/token", {});
   return j.token as string;
 }
 export async function staffList(): Promise<{ students: Student[]; att: AttMap }> {
-  const j = await jget("/api/staff/list");
+  const j = await jpost("/api/staff/list", {});
   const students: Student[] = (j.students || []).map((r: any) => {
     const prefix = (r.prefix || "").trim();
     const first = (r.first || "").trim();

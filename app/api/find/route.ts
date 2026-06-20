@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-server";
 import { findStudents } from "@/lib/find";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
-// ค้นหาสาธารณะ (ไม่ต้องล็อกอิน) — คืนเฉพาะรายการที่ตรง สูงสุด 8 รายการ
-// browser ไม่เคยแตะตารางตรง ทุกอย่างผ่านเซิร์ฟเวอร์ (service-role) ที่กรองให้แล้ว
-export async function GET(req: NextRequest) {
-  const q = (req.nextUrl.searchParams.get("q") || "").trim();
+// ค้นหาสาธารณะ (ไม่ต้องล็อกอิน) — คืนเฉพาะรายการที่ตรง สูงสุด 8
+// browser ไม่เคยแตะตารางตรง (ผ่าน service-role ที่กรองแล้ว)
+export async function POST(req: NextRequest) {
+  let q = "";
+  try {
+    const b = await req.json();
+    q = String(b?.q || "").trim();
+  } catch {}
   if (q.length < 2) return NextResponse.json({ ok: true, rows: [] });
 
   try {
