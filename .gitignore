@@ -34,3 +34,7 @@ next-env.d.ts
 # ── ข้อมูลติดต่อสายรหัส (PII) ──
 *.xlsx
 supabase/seed-sai.sql
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
