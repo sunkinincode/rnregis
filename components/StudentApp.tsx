@@ -11,6 +11,23 @@ import {
 const TUT_KEY = "regis.tutorial";
 type Tut = { search?: 1; house?: 1; line?: 1; sai?: 1 };
 
+// เปิดรับอนุกรรมการสโมสรนักศึกษา (ตามโปสเตอร์ Samo Sci PSU)
+const SAMO_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSeuY0KMzePQicwDPyYQiA1AsVPJFQ-gnylrl6S7OgVZNOGisA/viewform";
+const SAMO_QUALIFICATIONS = [
+  "เป็นนักศึกษาชั้นปีที่ 1 หรือ 2 คณะวิทยาศาสตร์ ม.อ.",
+  "ไม่ได้ดำรงตำแหน่งกรรมการในชุมนุม องค์กร หรือคณะกรรมการประจำชั้นปีอื่น ๆ ในมหาวิทยาลัย",
+  "มีความประพฤติดี เรียบร้อย ไม่เคยถูกลงโทษทางวินัย",
+  "เสียสละ ซื่อสัตย์ มีมนุษยสัมพันธ์ดี ทำงานร่วมกับผู้อื่นได้",
+  "กล้าแสดงออก พร้อมเรียนรู้และพัฒนาตนเองอยู่เสมอ",
+];
+const SAMO_POSITIONS = [
+  "นายกสโมสรนักศึกษาฯ", "อุปนายกฝ่ายบริหาร", "อุปนายกฝ่ายกิจการภายใน",
+  "อุปนายกฝ่ายกิจการภายนอก", "อุปนายกฝ่ายกลยุทธ์และแผนงาน", "เลขานุการ", "เหรัญญิก",
+  "ฝ่ายอินโฟกราฟิก", "ฝ่ายทะเบียนและประเมินผล", "ฝ่ายโสตทัศนูปกรณ์",
+  "ฝ่ายกีฬา", "ฝ่ายประชาสัมพันธ์", "ฝ่ายสวัสดิการ",
+];
+
 export default function StudentApp() {
   const [pdpaOpen, setPdpaOpen] = React.useState(false);
   const [pdpaAgree, setPdpaAgree] = React.useState(false);
@@ -248,6 +265,52 @@ export default function StudentApp() {
             </span>
             <span className="sai-cta">กรอกข้อมูล&nbsp;→</span>
           </Link>
+
+          <div className="recruit">
+            <div className="recruit-head">
+              <span className="recruit-tag">Samo Sci PSU · สโมสรนักศึกษา</span>
+              <h2>ขอบคุณที่มาเล่นด้วยกันนะ 💙</h2>
+              <p>
+                ขอบคุณพี่ ๆ ทุกชุมนุม และน้อง ๆ ทุกคน ที่ทำให้รับน้องคณะวิทยาศาสตร์ปีนี้อบอุ่นและสนุก —
+                ถ้าอยากสานต่อความสนุกนี้ มาเป็นทีมเดียวกันกับเราได้เลย!
+              </p>
+            </div>
+
+            <div className="recruit-card">
+              <div className="recruit-card-top">
+                <span className="recruit-emoji" aria-hidden="true">🧪</span>
+                <div>
+                  <b>เปิดรับอนุกรรมการสโมสรนักศึกษา</b>
+                  <span>คณะวิทยาศาสตร์ · เลือกได้ 2 อันดับ</span>
+                </div>
+              </div>
+
+              <div className="recruit-sec">
+                <h3>คุณสมบัติผู้สมัคร</h3>
+                <ul className="recruit-list">
+                  {SAMO_QUALIFICATIONS.map((t, i) => (
+                    <li key={i}><IconCheck /><span>{t}</span></li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="recruit-sec">
+                <h3>ตำแหน่งที่เปิดรับ</h3>
+                <div className="recruit-chips">
+                  {SAMO_POSITIONS.map((p) => (
+                    <span key={p} className="recruit-chip">{p}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="recruit-foot">
+                <span className="recruit-date">🗓️ เปิดรับสมัคร 21 มิ.ย. – 2 ก.ค.</span>
+                <a className="btn btn-gold btn-block btn-lg" href={SAMO_FORM_URL} target="_blank" rel="noopener">
+                  สมัครเลย — กรอกฟอร์ม →
+                </a>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 

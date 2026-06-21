@@ -599,6 +599,41 @@ body:not([data-role="staff"]){
   .sai-cta{ width:100%; text-align:end; }
 }
 
+/* ปิดท้ายกิจกรรม + เชิญชวนสมัครอนุกรรมการสโม */
+.recruit{ margin-top:8px; display:flex; flex-direction:column; gap:14px; }
+.recruit-head{ text-align:center; padding:4px 6px 0; }
+.recruit-tag{ display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.03em;
+  color:oklch(0.30 0.06 70); background:var(--gem-gold); padding:4px 13px; border-radius:var(--r-full);
+  box-shadow:0 4px 14px oklch(0.82 0.15 85 / .3); }
+.recruit-head h2{ margin-top:12px; font-size:1.2rem; font-weight:800; color:var(--gem-ink); letter-spacing:-.01em; }
+.recruit-head p{ margin-top:7px; font-size:.9rem; line-height:1.6; color:var(--gem-soft); text-wrap:pretty; }
+
+.recruit-card{ border-radius:var(--r-lg); padding:18px; backdrop-filter:blur(9px) saturate(1.2);
+  background:linear-gradient(160deg, oklch(0.6 0.12 90 / .18), oklch(0.5 0.1 250 / .16));
+  border:1.5px solid oklch(0.84 0.14 88 / .4); box-shadow:0 10px 30px oklch(0.10 0.07 266 / .4);
+  display:flex; flex-direction:column; gap:17px; }
+.recruit-card-top{ display:flex; align-items:center; gap:13px; }
+.recruit-emoji{ flex:none; width:46px; height:46px; border-radius:13px; display:grid; place-items:center;
+  font-size:1.5rem; line-height:1; background:linear-gradient(145deg, var(--gem-gold), var(--gem-gold-d));
+  box-shadow:inset 0 1px 0 oklch(1 0 0 / .45), 0 3px 12px oklch(0.82 0.15 85 / .35); }
+.recruit-card-top > div{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.recruit-card-top b{ color:var(--gem-ink); font-weight:700; font-size:1.02rem; line-height:1.25; }
+.recruit-card-top > div span{ color:var(--gem-soft); font-size:.82rem; }
+
+.recruit-sec h3{ font-size:.82rem; font-weight:700; letter-spacing:.02em;
+  color:var(--gem-gold); margin-bottom:10px; }
+.recruit-list{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.recruit-list li{ display:flex; gap:9px; font-size:.86rem; line-height:1.5; color:var(--gem-ink); }
+.recruit-list li svg{ width:16px; height:16px; flex:none; margin-top:3px; color:var(--gem-gold); }
+
+.recruit-chips{ display:flex; flex-wrap:wrap; gap:7px; }
+.recruit-chip{ font-size:.8rem; font-weight:600; color:var(--gem-ink);
+  background:oklch(0.55 0.07 252 / .4); border:1px solid oklch(0.82 0.1 245 / .3);
+  padding:5px 11px; border-radius:var(--r-full); }
+
+.recruit-foot{ display:flex; flex-direction:column; gap:11px; }
+.recruit-date{ text-align:center; font-size:.86rem; font-weight:600; color:var(--gem-soft); }
+
 /* การ์ดผลลัพธ์ — เหลี่ยมอัญมณี + ขอบทอง */
 .detail-overlay .detail{ box-shadow:var(--shadow-lg), 0 0 0 1px oklch(0.85 0.13 88 / .25); }
 .detail-overlay .detail-hero{ box-shadow:inset 0 -1px 0 oklch(0.86 0.14 88 / .3); }
