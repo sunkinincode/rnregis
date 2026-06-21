@@ -120,7 +120,7 @@ export default function StaffApp() {
     async (id: string, slot: SlotId, val: boolean) => {
       const prev = att[id];
       setAtt((a) => {
-        const cur: AttRec = a[id] || { d1: 0, d2: 0, out: 0, ts: { d1: 0, d2: 0, out: 0 } };
+        const cur: AttRec = a[id] || { d1: 0, d2: 0, ts: { d1: 0, d2: 0 } };
         const next: AttRec = { ...cur, ts: { ...cur.ts } };
         next[slot] = val ? 1 : 0;
         next.ts[slot] = val ? Date.now() : 0;
@@ -342,7 +342,7 @@ function Console({
           <div className="fb-name">{s.name} <span style={{ color: "var(--ink-3)", fontWeight: 600 }}>· บ้าน {s.house}</span></div>
           <div className="fb-sub">
             {already ? "เช็คชื่อช่วงนี้ไว้แล้ว" : "เช็คชื่อ " + cpName + " เรียบร้อย"}
-            {complete && <> — <b>ครบ 3 ช่วง ได้ชั่วโมงกิจกรรม 🎉</b></>}
+            {complete && <> — <b>ครบ 2 ช่วง ได้ชั่วโมงกิจกรรม 🎉</b></>}
           </div>
           <div className="fb-chips">
             {SLOTS.map((slot) => {
@@ -438,13 +438,12 @@ function Console({
           <div className="section-label">ภาพรวม</div>
           <div className="stats">
             <div className="stat hl">
-              <div className="k">ครบ 3 ช่วง (ได้ชั่วโมง)</div>
+              <div className="k">ครบ 2 ช่วง (ได้ชั่วโมง)</div>
               <div className="v tnum">{countComplete} <small>/ {total}</small></div>
               <div className="bar"><i style={{ width: pct + "%" }} /></div>
             </div>
             <div className="stat"><div className="k">{CHECKPOINTS[0].v} · {CHECKPOINTS[0].date}</div><div className="v tnum">{countSlot("d1")}</div></div>
             <div className="stat"><div className="k">{CHECKPOINTS[1].v} · {CHECKPOINTS[1].date}</div><div className="v tnum">{countSlot("d2")}</div></div>
-            <div className="stat"><div className="k">{CHECKPOINTS[2].v}</div><div className="v tnum">{countSlot("out")}</div></div>
           </div>
         </section>
 
@@ -460,7 +459,7 @@ function Console({
             </select>
             <select className="sel" value={fltStatus} onChange={(e) => setFltStatus(e.target.value)}>
               <option value="">ทุกสถานะ</option>
-              <option value="ok">ครบ 3 ช่วง</option>
+              <option value="ok">ครบ 2 ช่วง</option>
               <option value="no">ยังไม่ครบ</option>
             </select>
             <button className="btn btn-ghost" onClick={() => { exportCsv(students, att); toast("ดาวน์โหลดไฟล์ CSV แล้ว (" + total + " รายชื่อ)", "ok"); }}>
@@ -476,7 +475,6 @@ function Console({
                   <th className="c">บ้าน</th>
                   <th className="c">{CHECKPOINTS[0].v}<br /><small style={{ fontWeight: 500, color: "var(--ink-3)" }}>{CHECKPOINTS[0].date}</small></th>
                   <th className="c">{CHECKPOINTS[1].v}<br /><small style={{ fontWeight: 500, color: "var(--ink-3)" }}>{CHECKPOINTS[1].date}</small></th>
-                  <th className="c">{CHECKPOINTS[2].v}</th>
                   <th className="c">สถานะ</th>
                 </tr>
               </thead>

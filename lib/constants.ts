@@ -1,25 +1,22 @@
 // ค่าคงที่ที่ใช้ทั้งฝั่ง server และ client
 
-export type SlotId = "d1" | "d2" | "out";
+export type SlotId = "d1" | "d2";
 
 export const CHECKPOINTS: { id: SlotId; k: string; v: string; date: string }[] = [
   { id: "d1", k: "ช่วงที่ 1", v: "เข้างานวันแรก", date: "20 มิ.ย." },
-  { id: "d2", k: "ช่วงที่ 2", v: "เข้างานวันสอง", date: "21 มิ.ย." },
-  { id: "out", k: "ช่วงที่ 3", v: "ออกงาน", date: "" },
+  { id: "d2", k: "ช่วงที่ 2", v: "เข้างานวันสอง", date: "21 มิ.ย. (เช้า)" },
 ];
 
 export const SLOTS: SlotId[] = CHECKPOINTS.map((c) => c.id);
 
 // map slot → ชื่อคอลัมน์ในตาราง attendance (เลี่ยงคำสงวน "out")
-export const SLOT_COL: Record<SlotId, "d1" | "d2" | "dout"> = {
+export const SLOT_COL: Record<SlotId, "d1" | "d2"> = {
   d1: "d1",
   d2: "d2",
-  out: "dout",
 };
-export const SLOT_AT_COL: Record<SlotId, "d1_at" | "d2_at" | "dout_at"> = {
+export const SLOT_AT_COL: Record<SlotId, "d1_at" | "d2_at"> = {
   d1: "d1_at",
   d2: "d2_at",
-  out: "dout_at",
 };
 
 export const PDPA_VERSION = "1";
@@ -43,8 +40,7 @@ export type Student = {
 export type AttRec = {
   d1: 0 | 1;
   d2: 0 | 1;
-  out: 0 | 1;
-  ts: { d1: number; d2: number; out: number };
+  ts: { d1: number; d2: number };
 };
 export type AttMap = Record<string, AttRec>;
 
@@ -54,8 +50,7 @@ export function rowToRec(row: any): AttRec {
   return {
     d1: row.d1 ? 1 : 0,
     d2: row.d2 ? 1 : 0,
-    out: row.dout ? 1 : 0,
-    ts: { d1: ms(row.d1_at), d2: ms(row.d2_at), out: ms(row.dout_at) },
+    ts: { d1: ms(row.d1_at), d2: ms(row.d2_at) },
   };
 }
 

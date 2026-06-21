@@ -15,8 +15,8 @@ export function fmtTs(ms: number): string {
   );
 }
 
-const has = (att: AttMap, id: string, slot: "d1" | "d2" | "out") => !!(att[id] && att[id][slot]);
-const tsOf = (att: AttMap, id: string, slot: "d1" | "d2" | "out") =>
+const has = (att: AttMap, id: string, slot: "d1" | "d2") => !!(att[id] && att[id][slot]);
+const tsOf = (att: AttMap, id: string, slot: "d1" | "d2") =>
   att[id] && att[id].ts ? att[id].ts[slot] : 0;
 export const isComplete = (att: AttMap, id: string) => SLOTS.every((s) => has(att, id, s));
 
@@ -26,8 +26,7 @@ export function exportCsv(students: Student[], att: AttMap) {
     "รหัสนักศึกษา", "คำนำหน้า", "ชื่อ", "สกุล", "บ้าน", "หลักสูตร",
     CHECKPOINTS[0].v + " (" + CHECKPOINTS[0].date + ")", "เวลาเช็ค " + CHECKPOINTS[0].v,
     CHECKPOINTS[1].v + " (" + CHECKPOINTS[1].date + ")", "เวลาเช็ค " + CHECKPOINTS[1].v,
-    CHECKPOINTS[2].v, "เวลาเช็ค " + CHECKPOINTS[2].v,
-    "ครบ 3 ช่วง", "ได้ชั่วโมงกิจกรรม",
+    "ครบ 2 ช่วง", "ได้ชั่วโมงกิจกรรม",
   ];
   const rows: (string | number)[][] = [header];
   for (const s of students) {
@@ -36,7 +35,6 @@ export function exportCsv(students: Student[], att: AttMap) {
       s.id, s.prefix, s.first, s.last, "บ้าน " + s.house, s.program,
       has(att, s.id, "d1") ? "มา" : "", fmtTs(tsOf(att, s.id, "d1")),
       has(att, s.id, "d2") ? "มา" : "", fmtTs(tsOf(att, s.id, "d2")),
-      has(att, s.id, "out") ? "มา" : "", fmtTs(tsOf(att, s.id, "out")),
       complete ? "ครบ" : "ไม่ครบ", complete ? "ได้" : "",
     ]);
   }
